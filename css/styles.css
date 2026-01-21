@@ -955,3 +955,40 @@ footer {
         text-align: center;
     }
 }
+
+/* =========================================
+   Enfoque Regional List (Internal Card)
+   ========================================= */
+.about-card .municipios-internal-grid {
+    text-align: left;
+}
+
+.municipios-internal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 20px;
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.m-item {
+    font-size: 0.85rem;
+    color: #444;
+    display: flex;
+    align-items: center;
+}
+
+.m-item i {
+    font-size: 0.6rem;
+    color: var(--primary-color);
+    margin-right: 6px;
+    width: 14px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .municipios-internal-grid {
+        grid-template-columns: 1fr;
+    }
+}
