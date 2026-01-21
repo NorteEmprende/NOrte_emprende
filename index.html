@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emprendimiento Joven - Norte de Santander</title>
+    <title>NextGen Emprende NDS</title>
     <meta name="description"
         content="Fortalecimiento de los Emprendimientos para los Jóvenes en el Departamento Norte de Santander. Postúlate ahora.">
 
@@ -22,13 +22,24 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
+    <!-- Modal for Video/Image -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
     <!-- Ribbon -->
     <div class="top-ribbon">
-        <p>Fortaleciendo el Emprendimiento Juvenil – Norte de Santander 2025</p>
+        <p>Fortaleciendo el Emprendimiento Juvenil – Norte de Santander 2026</p>
     </div>
 
     <!-- Header -->
@@ -36,15 +47,15 @@
         <div class="container header-container">
             <div class="logo">
                 <i class="fa-solid fa-rocket"></i>
-                <span>Emprende Norte</span>
+                <span>NextGen Emprende</span>
             </div>
             <nav>
                 <ul class="nav-links">
                     <li><a href="#hero">Inicio</a></li>
-                    <li><a href="#about">Convocatoria</a></li>
-                    <li><a href="#stages">Etapas</a></li>
-                    <li><a href="#registration">Formulario</a></li>
-                    <li><a href="#contact">Contacto</a></li>
+                    <li><a href="#proyecto">Nuestro Proyecto</a></li>
+                    <li><a href="#criterios">Postúlate</a></li>
+                    <li><a href="#comunidad">Comunidad</a></li>
+                    <li><a href="#vitrina">Vitrina</a></li>
                 </ul>
                 <div class="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
@@ -53,18 +64,19 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Section (A) -->
     <section id="hero">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
-            <h1 data-aos="fade-up">Impulsa tu Futuro Emprendedor</h1>
-            <p data-aos="fade-up" data-aos-delay="200">Únete al programa de fortalecimiento para jóvenes de Norte de
-                Santander. ¡Haz crecer tu idea!</p>
-            <a href="#registration" class="btn btn-primary" data-aos="fade-up" data-aos-delay="400">Postúlate Ahora</a>
+            <h1 data-aos="fade-up">NextGen Emprende NDS</h1>
+            <p data-aos="fade-up" data-aos-delay="200">Impulsando el futuro de los jóvenes nortesantandereanos.
+                Innovación, crecimiento y liderazgo.</p>
+            <a href="#criterios" class="btn btn-primary" data-aos="fade-up" data-aos-delay="400">Conoce los
+                requisitos</a>
         </div>
     </section>
 
-    <!-- Counter Section -->
+    <!-- Counter Section (B - Part of Data) -->
     <section id="counter-section">
         <div class="container">
             <div class="counter-box">
@@ -74,100 +86,91 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="section-padding">
+    <!-- Nuestro Proyecto (B) -->
+    <section id="proyecto" class="section-padding">
         <div class="container">
-            <h2 class="section-title">Sobre el Proyecto</h2>
-            <div class="about-grid">
-                <div class="about-card">
-                    <i class="fa-solid fa-users-gear"></i>
-                    <h3>Desarrollo Productivo</h3>
-                    <p>Fomentamos la creación y consolidación de unidades productivas lideradas por jóvenes.</p>
-                </div>
-                <div class="about-card">
-                    <i class="fa-solid fa-chalkboard-user"></i>
-                    <h3>Formación Integral</h3>
-                    <p>Capacitaciones en gestión empresarial, marketing y finanzas.</p>
-                </div>
-                <div class="about-card">
-                    <i class="fa-solid fa-seedling"></i>
-                    <h3>Capital Semilla</h3>
-                    <p>Recursos para impulsar el crecimiento de los emprendimientos seleccionados.</p>
-                </div>
-                <div class="about-card">
-                    <i class="fa-solid fa-handshake-angle"></i>
-                    <h3>Asesoría Técnica</h3>
-                    <p>Acompañamiento experto durante todo el proceso de fortalecimiento.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stages Section -->
-    <section id="stages" class="section-padding bg-light">
-        <div class="container">
-            <h2 class="section-title">Etapas del Programa</h2>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fa-solid fa-bullhorn"></i></div>
-                    <div class="timeline-content">
-                        <h3>1. Promoción y Selección</h3>
-                        <p>Inscripción de beneficiarios y evaluación de perfiles.</p>
+            <h2 class="section-title">Nuestro Proyecto</h2>
+            <div class="content-block text-center">
+                <p class="lead-text">NextGen Emprende NDS es una iniciativa dedicada a identificar, potenciar y
+                    visibilizar el talento joven de Norte de Santander.</p>
+                <div class="about-grid mt-4">
+                    <div class="about-card">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <h3>Objetivo</h3>
+                        <p>Fortalecer las capacidades empresariales de la juventud local mediante herramientas digitales
+                            y acceso a mercados.</p>
                     </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fa-solid fa-brain"></i></div>
-                    <div class="timeline-content">
-                        <h3>2. Fortalecimiento</h3>
-                        <p>Talleres y cursos para potenciar habilidades.</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fa-solid fa-store"></i></div>
-                    <div class="timeline-content">
-                        <h3>3. Ferias de Servicios</h3>
-                        <p>Espacios para conectar y visibilizar emprendimientos.</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fa-solid fa-wrench"></i></div>
-                    <div class="timeline-content">
-                        <h3>4. Asistencia Técnica</h3>
-                        <p>Soporte personalizado para cada proyecto.</p>
-                    </div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-icon"><i class="fa-solid fa-chart-line"></i></div>
-                    <div class="timeline-content">
-                        <h3>5. Seguimiento</h3>
-                        <p>Evaluación de impacto y sostenibilidad.</p>
+                    <div class="about-card">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <h3>Enfoque Regional</h3>
+                        <p>Impactamos municipios priorizados del departamento, creando redes de valor para el desarrollo
+                            territorial.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Registration Form -->
-    <section id="registration" class="section-padding">
+    <!-- Criterios de Postulación (C) -->
+    <section id="criterios" class="section-padding bg-light">
         <div class="container">
-            <h2 class="section-title">Inscríbete Aquí</h2>
-            <!-- Google Form Embed -->
-            <div class="form-responsive-wrapper" style="display: flex; justify-content: center;">
-                <iframe
-                    src="https://docs.google.com/forms/d/e/1FAIpQLSfLQqNfXPyOt90WbArYJQIcHxuX9EaVYZJ_iQ6u1vS8eZgHmw/viewform?embedded=true"
-                    width="100%" height="1600" frameborder="0" marginheight="0" marginwidth="0"
-                    style="max-width: 640px; background: white; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">Cargando
-                    formulario...</iframe>
+            <h2 class="section-title">Requisitos de Postulación</h2>
+            <div class="criterios-container">
+                <ul class="requirements-list">
+                    <li><i class="fa-solid fa-check"></i> Tener entre 18 y 28 años.</li>
+                    <li><i class="fa-solid fa-check"></i> Ser colombiano(a).</li>
+                    <li><i class="fa-solid fa-check"></i> Residir en municipios habilitados de Norte de Santander.</li>
+                    <li><i class="fa-solid fa-check"></i> Emprendimiento en funcionamiento (mínimo 6 meses de
+                        antigüedad).</li>
+                    <li><i class="fa-solid fa-check"></i> Adjuntar documento de identidad.</li>
+                    <li><i class="fa-solid fa-check"></i> Cámara de Comercio (si está formalizado).</li>
+                    <li><i class="fa-solid fa-check"></i> Evidencias del emprendimiento (fotos/redes) si no está
+                        formalizado.</li>
+                    <li><i class="fa-solid fa-check"></i> Informe ejecutivo (mínimo 2 páginas).</li>
+                    <li><i class="fa-solid fa-check"></i> Video de presentación (máx. 2 minutos).</li>
+                    <li><i class="fa-solid fa-check"></i> Certificado de residencia.</li>
+                    <li><i class="fa-solid fa-check"></i> Certificación de Sisbén.</li>
+                    <li><i class="fa-solid fa-check"></i> Certificación especial (si pertenece a comunidad vulnerable).
+                    </li>
+                </ul>
+                <div class="cta-container text-center mt-5">
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdVjfjqlgQ2XJ_y4xy5TyJfNCVb38AsW-nUNLmMu9mtOL2mRw/viewform?usp=dialog"
+                        target="_blank" class="btn btn-primary btn-large">
+                        Postúlate aquí <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comunidad Emprendedora (D) -->
+    <section id="comunidad" class="section-padding">
+        <div class="container">
+            <h2 class="section-title">Comunidad Emprendedora</h2>
+            <div id="emprendimientos-grid" class="cards-grid">
+                <!-- Dynamic Content Loading -->
+                <div class="loader">Cargando emprendimientos...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vitrina NextGen (E) -->
+    <section id="vitrina" class="section-padding bg-light">
+        <div class="container">
+            <h2 class="section-title">Vitrina NextGen</h2>
+            <div id="vitrina-grid" class="gallery-grid">
+                <!-- Dynamic Content Loading -->
+                <div class="loader">Cargando galería...</div>
             </div>
         </div>
     </section>
 
     <!-- Map Section -->
-    <section id="map-section" class="section-padding bg-light">
+    <section id="map-section" class="section-padding">
         <div class="container">
             <h2 class="section-title">Conoce tu Región</h2>
             <p class="section-subtitle">Municipios beneficiados en Norte de Santander</p>
-            <div id="map"></div>
+            <div id="map" style="height: 500px; border-radius: 10px; z-index: 1;"></div>
         </div>
     </section>
 
@@ -188,7 +191,8 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Gobernación de Norte de Santander. Todos los derechos reservados.</p>
+            <p>&copy; 2025 NextGen Emprende NDS. Todos los derechos reservados. <a href="admin/index.html"
+                    style="color: inherit; opacity: 0.1; margin-left:10px;">Admin</a></p>
         </div>
     </footer>
 
@@ -198,9 +202,10 @@
     </a>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/app.js"></script>
 </body>
 
