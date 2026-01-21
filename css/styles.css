@@ -583,6 +583,117 @@ footer {
 }
 
 /* =========================================
+   Logo Styles (Header)
+   ========================================= */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Space between images and text */
+}
+
+.header-logos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logos img {
+    height: 45px;
+    /* Adjusted height */
+    width: auto;
+    object-fit: contain;
+}
+
+.logo span {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* =========================================
+   Footer Logos
+   ========================================= */
+.footer-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 40px 0 20px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.footer-logos img {
+    height: 60px;
+    /* Uniform height for footer logos */
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    /* Make them white if footer is dark, or keep valid if not */
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.footer-logos img:hover {
+    opacity: 1;
+}
+
+/* Adjust for light footer background if needed. 
+   Assuming footer is dark based on typical designs, white filter is good. 
+   If images are already correct, remove filter. 
+   Let's check current footer style. It has "background-color: var(--dark-color); color: #fff;" 
+   So white filter is likely desired for transparency logos if they are black.
+   BUT user said "img/Consorcio NJ.png", "LOGO NEXT GEN .png". 
+   If they are colored logos, filter might ruin them. 
+   Safest is NO filter initially, or check if user wants monochrome.
+   "Mantener colores" -> Remove filter.
+*/
+
+.footer-logos img {
+    filter: none;
+    /* Keep original colors */
+    background: rgba(255, 255, 255, 0.1);
+    /* Optional: subtle bg if logos have dark text on dark footer */
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .header-logos img {
+        height: 35px;
+    }
+
+    .logo span {
+        font-size: 1rem;
+        display: none;
+        /* Hide text on very small screens if crowded? Or user said "text must remain visible". 
+        Let's keep text but maybe smaller. */
+    }
+
+    .footer-logos {
+        gap: 15px;
+    }
+
+    .footer-logos img {
+        height: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo span {
+        font-size: 0.9rem;
+        /* Smaller text */
+    }
+
+    .header-logos {
+        gap: 5px;
+    }
+}
+
+/* =========================================
    New Styles for NextGen Refactor
    ========================================= */
 
