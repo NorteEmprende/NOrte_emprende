@@ -170,7 +170,7 @@ ul {
     height: 90vh;
     min-height: 600px;
     max-height: 900px;
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') 50% 30%/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('../img/Banner.png') 50% 30%/cover no-repeat;
     display: flex;
     align-items: center;
     text-align: center;
