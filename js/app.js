@@ -267,8 +267,8 @@ function createCommunityCard(fecha, descripcion, url) {
 /* --- Vitrina NextGen --- */
 
 async function loadVitrina() {
-    // UPDATED URL (GViz)
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR47D7VTJJ_9R2D9XJ9g7o5LOmSn8btq2pyAaHBEZpwxp9Nt4aonVSNY__b5EUAifASAsahzYoMLFtD/gviz/tq?tqx=out:csv&gid=0';
+    // CORRECT URL: direct pub csv export
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR47D7VTJJ_9R2D9XJ9g7o5LOmSn8btq2pyAaHBEZpwxp9Nt4aonVSNY__b5EUAifASAsahzYoMLFtD/pub?gid=0&single=true&output=csv';
     const container = document.getElementById('vitrina-grid');
 
     if (!container) return;
@@ -278,7 +278,10 @@ async function loadVitrina() {
         const text = await response.text();
         const lines = text.split('\n').filter(l => l.trim() !== '');
 
-        const rows = lines.slice(1); // Skip header
+        // Skip header? 
+        // Sheet: [Fecha] [Mensaje] [Adjunto]
+        // Usually export includes headers. Let's try skipping first row.
+        const rows = lines.slice(1);
 
         container.innerHTML = '';
 
@@ -286,34 +289,27 @@ async function loadVitrina() {
 
         rows.forEach(row => {
             const cols = parseCSVLine(row);
-            // Expected: [Imagen_URL, Descripcion, Fecha, Activo]
-            if (cols.length < 2) return;
+            // Expected: [Fecha, Mensaje, URL] (Col A, B, C)
+            if (cols.length < 3) return;
 
-            const imgUrl = cols[0].replace(/^"|"$/g, '');
-            const actifCol = cols[cols.length - 1] || '';
-            const activo = actifCol.toLowerCase().replace(/^"|"$/g, '');
-            const fechaCol = cols[cols.length - 2] || '';
-            const fecha = fechaCol.replace(/^"|"$/g, '');
+            const fecha = cols[0].replace(/^"|"$/g, '').trim();
+            const descripcion = cols[1].replace(/^"|"$/g, '').trim();
+            const imgUrl = cols[2].replace(/^"|"$/g, '').trim(); // Col C
 
-            const descParts = cols.slice(1, cols.length - 2);
-            const descripcion = descParts.join(', ').replace(/^"|"$/g, '');
-
-            // Check Active
-            if (activo === 'si' || activo === 'true' || activo === '1' || activo === 'yes') {
-                if (imgUrl.trim()) {
-                    container.appendChild(createVitrinaCard(imgUrl.trim(), descripcion, fecha));
-                    hasContent = true;
-                }
+            // Only render if we have a URL
+            if (imgUrl) {
+                container.appendChild(createVitrinaCard(imgUrl, descripcion, fecha));
+                hasContent = true;
             }
         });
 
         if (!hasContent) {
-            container.innerHTML = '<p class="text-center" style="grid-column:1/-1">Próximamente más contenido.</p>';
+            // Leave empty as requested? Or basic message?
+            // User asked to remove "Próximamente" message.
         }
 
     } catch (err) {
         console.error('Error Vitrina:', err);
-        container.innerHTML = '<p class="text-center">Próximamente más contenido.</p>';
     }
 }
 
@@ -324,19 +320,25 @@ function createVitrinaCard(imgUrl, descripcion, fecha) {
 
     // Thumbnail logic
     const thumbUrl = getThumbnailUrl(imgUrl);
-    const imgSrc = thumbUrl || 'img/LOGO NEXT GEN .png';
-    const imgStyle = thumbUrl ? 'object-fit:cover;' : 'object-fit:contain; padding:20px;';
+
+    // STRICT RULE: No Logo Fallback
+    let imgHtml = '';
+    if (thumbUrl) {
+        imgHtml = `<img src="${thumbUrl}" alt="Vitrina" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+    } else {
+        imgHtml = `<div style="width:100%; height:100%; background:#eee;"></div>`;
+    }
 
     const safeDesc = escapeHtml(descripcion);
     const safeFecha = escapeHtml(fecha);
 
     div.innerHTML = `
-        <div class="video-thumbnail" style="background:#f4f4f4;">
-             <img src="${imgSrc}" alt="Vitrina" loading="lazy" style="width:100%; height:100%; ${imgStyle}">
+        <div class="video-thumbnail" style="background:#f4f4f4; position:relative; overflow:hidden;">
+             ${imgHtml}
         </div>
         <div class="card-info">
             <small style="color:#999;">${safeFecha}</small>
-            <h3 style="font-size:1rem; margin-top:5px;">${safeDesc.substring(0, 60)}${safeDesc.length > 60 ? '...' : ''}</h3>
+            <h3 style="font-size:1rem; margin-top:5px;">${safeDesc.substring(0, 80)}${safeDesc.length > 80 ? '...' : ''}</h3>
         </div>
     `;
 
