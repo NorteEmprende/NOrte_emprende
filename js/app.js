@@ -21,6 +21,9 @@ async function initApp() {
 
     // 6. Init Map
     initMap();
+
+    // 7. Load Vitrina
+    loadVitrina();
 }
 
 /* =========================================
@@ -136,25 +139,65 @@ function initMap() {
 }
 
 /* =========================================
-   Data Loading (Google Sheets CSV)
+   Data Loading & Rendering (Refactored)
    ========================================= */
+
+// Regex based CSV parser to handle quoted strings containing commas
+function parseCSVLine(line) {
+    const matches = [];
+    let current = '';
+    let inQuote = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            inQuote = !inQuote;
+        } else if (char === ',' && !inQuote) {
+            matches.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    matches.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+    return matches;
+}
+
+function getThumbnailUrl(url) {
+    if (!url) return null;
+
+    // Check for Drive URL
+    const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch) {
+        return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w800`;
+    }
+
+    // Return original if it looks like an image URL
+    if (url.match(/^http/)) {
+        return url;
+    }
+
+    return null;
+}
+
+function extractDriveId(url) {
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : null;
+}
+
+/* --- Comunidad Emprendedora --- */
 
 async function loadFromCSV() {
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRkc4vazCHrgzXe9gkhMqZPKEQFor5493mm9iwZ8AqUO3wLMl4WbmJvv6leMBrmRlwX9bOF0-mzsZOF/pub?gid=0&single=true&output=csv';
     const container = document.getElementById('emprendimientos-grid');
-    const vitrinaContainer = document.getElementById('vitrina-grid');
-
-    // Hide Vitrina section as we will merge everything into Comunidad
-    // or we can duplicate. Let's merge for cleanliness or clear it.
-    if (vitrinaContainer) vitrinaContainer.innerHTML = '<p class="text-center">Ver en Comunidad</p>';
 
     try {
         const response = await fetch(csvUrl);
         const text = await response.text();
+        const lines = text.split('\n').filter(l => l.trim() !== '');
 
-        // Parse CSV (Simple parsing assuming no commas in description, or handling basic quoting if needed)
-        // Header: Fecha,Descripcion,url
-        const rows = text.split('\n').slice(1); // Skip header
+        // Skip header
+        const rows = lines.slice(1);
 
         container.innerHTML = '';
 
@@ -164,88 +207,179 @@ async function loadFromCSV() {
         }
 
         rows.forEach(row => {
-            if (!row.trim()) return;
-            const cols = row.split(','); // Be careful if desc has commas. For now simple split.
-            // Adjust if description has commas (users often do). 
-            // Better regex for CSV:
-            // But let's assume simple structure first or use a regex splitter.
+            const cols = parseCSVLine(row);
+            if (cols.length < 3) return; // Need at least date, desc, url
 
-            // Fallback split logic handling simple cases
-            // Assuming order: Fecha, Descripcion, Url
-            // If description has commas, this breaks. 
-            // Let's try to match the URL pattern at the end and take the rest as description.
+            // Expected Cols: [Fecha, Descripcion, URL]
+            // Note: Description may be split if we used simple splitting in old code, 
+            // but parseCSVLine handles quotes correctly. 
+            // If the sheet doesn't use quotes for commas, parseCSVLine behaves like split(',') basically.
 
-            // Last column is URL (starts with http). First is Date. Middle is Desc.
-            const urlMatch = row.match(/https?:\/\/[^\s,]+/);
-            let url = urlMatch ? urlMatch[0] : '';
-
-            // Clean URL (remove \r)
-            url = url.replace(/\r$/, '');
-
-            const parts = row.split(',');
-            const fecha = parts[0];
-
-            // Description is everything between first comma and the URL index?
-            // Simpler: Split by comma, first is date, last is URL (if no extra commas after url).
-            // Let's rely on the user provided Sample: "Fecha,Descripcion,url"
-            // "10-01-2026,estamos contentos,https://..."
-
-            let description = parts.slice(1, parts.length - 1).join(',');
-            if (!url) {
-                // formatting fallback
-                url = parts[parts.length - 1].replace(/\r$/, '');
-            }
+            const fecha = cols[0];
+            const url = cols[cols.length - 1];
+            // Description is everything in between
+            let descripcion = cols.slice(1, cols.length - 1).join(', ');
 
             if (url) {
-                const card = createDriveCard(fecha, description, url);
-                container.appendChild(card);
+                container.appendChild(createCommunityCard(fecha, descripcion, url));
             }
         });
 
     } catch (err) {
-        console.error('Error loading CSV:', err);
+        console.error('Error Comunidad:', err);
         container.innerHTML = '<p class="text-center error">Error cargando información.</p>';
     }
 }
 
-function createDriveCard(fecha, descripcion, driveUrl) {
-    const fileId = extractDriveId(driveUrl);
+function createCommunityCard(fecha, descripcion, url) {
     const div = document.createElement('div');
     div.className = 'emprendimiento-card';
+    div.style.cursor = 'pointer';
 
-    // Thumbnail: Valid trick for Drive images is lh3 or simple export=view
-    // But for videos it's harder.
-    // We will use a generic "View" placeholder or try to fetch a thumb.
-    // Use high-res thumbnail logic if possible, or just a placeholder icon.
+    const thumbUrl = getThumbnailUrl(url);
+
+    // Fallback image (Logo) only if no thumb
+    const imgSrc = thumbUrl || 'img/LOGO NEXT GEN .png';
+    const imgStyle = thumbUrl ? 'object-fit:cover;' : 'object-fit:contain; padding:20px;';
+
+    const safeDesc = escapeHtml(descripcion);
+    const safeFecha = escapeHtml(fecha);
+    const safeUrl = url;
 
     div.innerHTML = `
-        <div class="video-thumbnail" onclick="openDriveModal('${fileId}')">
-            <div class="play-icon"><i class="fa-solid fa-eye"></i></div>
-            <p style="position:absolute; bottom:10px; color:white; width:100%; text-align:center; font-size:0.8rem;">Click para ver</p>
+        <div class="video-thumbnail" style="background:#f4f4f4;">
+            <img src="${imgSrc}" alt="Emprendimiento" loading="lazy" style="width:100%; height:100%; ${imgStyle}">
         </div>
         <div class="card-info">
-            <small style="color:#999;">${escapeHtml(fecha)}</small>
-            <h3 style="font-size:1rem; margin-top:5px;">${escapeHtml(descripcion)}</h3>
+            <small style="color:#999;">${safeFecha}</small>
+            <h3 style="font-size:1rem; margin-top:5px;">${safeDesc}</h3>
         </div>
     `;
+
+    // Add Click listener
+    div.addEventListener('click', () => {
+        openMediaModal(safeUrl, safeDesc, safeFecha);
+    });
+
     return div;
 }
 
-function extractDriveId(url) {
-    // Matches /d/ID/ or id=ID
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : '';
+/* --- Vitrina NextGen --- */
+
+async function loadVitrina() {
+    // UPDATED URL (GViz)
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR47D7VTJJ_9R2D9XJ9g7o5LOmSn8btq2pyAaHBEZpwxp9Nt4aonVSNY__b5EUAifASAsahzYoMLFtD/gviz/tq?tqx=out:csv&gid=0';
+    const container = document.getElementById('vitrina-grid');
+
+    if (!container) return;
+
+    try {
+        const response = await fetch(csvUrl);
+        const text = await response.text();
+        const lines = text.split('\n').filter(l => l.trim() !== '');
+
+        const rows = lines.slice(1); // Skip header
+
+        container.innerHTML = '';
+
+        let hasContent = false;
+
+        rows.forEach(row => {
+            const cols = parseCSVLine(row);
+            // Expected: [Imagen_URL, Descripcion, Fecha, Activo]
+            if (cols.length < 2) return;
+
+            const imgUrl = cols[0].replace(/^"|"$/g, '');
+            const actifCol = cols[cols.length - 1] || '';
+            const activo = actifCol.toLowerCase().replace(/^"|"$/g, '');
+            const fechaCol = cols[cols.length - 2] || '';
+            const fecha = fechaCol.replace(/^"|"$/g, '');
+
+            const descParts = cols.slice(1, cols.length - 2);
+            const descripcion = descParts.join(', ').replace(/^"|"$/g, '');
+
+            // Check Active
+            if (activo === 'si' || activo === 'true' || activo === '1' || activo === 'yes') {
+                if (imgUrl.trim()) {
+                    container.appendChild(createVitrinaCard(imgUrl.trim(), descripcion, fecha));
+                    hasContent = true;
+                }
+            }
+        });
+
+        if (!hasContent) {
+            container.innerHTML = '<p class="text-center" style="grid-column:1/-1">Próximamente más contenido.</p>';
+        }
+
+    } catch (err) {
+        console.error('Error Vitrina:', err);
+        container.innerHTML = '<p class="text-center">Próximamente más contenido.</p>';
+    }
 }
 
-function openDriveModal(fileId) {
-    if (!fileId) return;
-    // Use preview endpoint which handles both images and videos reasonably well in an iframe
-    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+function createVitrinaCard(imgUrl, descripcion, fecha) {
+    const div = document.createElement('div');
+    div.className = 'emprendimiento-card';
+    div.style.cursor = 'pointer';
 
-    const content = `
-        <iframe src="${embedUrl}" width="100%" height="500px" style="border:none;"></iframe>
+    // Thumbnail logic
+    const thumbUrl = getThumbnailUrl(imgUrl);
+    const imgSrc = thumbUrl || 'img/LOGO NEXT GEN .png';
+    const imgStyle = thumbUrl ? 'object-fit:cover;' : 'object-fit:contain; padding:20px;';
+
+    const safeDesc = escapeHtml(descripcion);
+    const safeFecha = escapeHtml(fecha);
+
+    div.innerHTML = `
+        <div class="video-thumbnail" style="background:#f4f4f4;">
+             <img src="${imgSrc}" alt="Vitrina" loading="lazy" style="width:100%; height:100%; ${imgStyle}">
+        </div>
+        <div class="card-info">
+            <small style="color:#999;">${safeFecha}</small>
+            <h3 style="font-size:1rem; margin-top:5px;">${safeDesc.substring(0, 60)}${safeDesc.length > 60 ? '...' : ''}</h3>
+        </div>
     `;
-    openModal(content);
+
+    div.addEventListener('click', () => {
+        openMediaModal(imgUrl, safeDesc, safeFecha);
+    });
+
+    return div;
+}
+
+/* --- Shared Modal Logic --- */
+
+function openMediaModal(urlOrId, description, date) {
+    const modal = document.getElementById("media-modal");
+    if (!modal) return;
+
+    const driveId = extractDriveId(urlOrId);
+    let contentHtml = '';
+
+    // 1. Is it a Drive File? -> Iframe Preview
+    if (driveId) {
+        const embedUrl = `https://drive.google.com/file/d/${driveId}/preview`;
+        contentHtml = `<iframe src="${embedUrl}" width="100%" height="500px" style="border:none; background:#000;"></iframe>`;
+    }
+    // 2. Is it a direct Image URL? -> Img Tag
+    else if (urlOrId.match(/\.(jpeg|jpg|gif|png|webp|bmp|svg)$/i) || urlOrId.startsWith('http')) {
+        contentHtml = `<img src="${urlOrId}" style="max-width:100%; max-height:70vh; border-radius:4px; object-fit:contain;">`;
+    }
+    else {
+        contentHtml = `<p>Contenido no visualizable.</p>`;
+    }
+
+    const bodyHtml = `
+        <div style="text-align:center; width:100%;">
+            ${contentHtml}
+            <div style="text-align:left; max-width:800px; margin:15px auto 0; padding:10px; background:#fff; border-radius:8px;">
+                <p style="color:#666; font-size:0.85rem; margin-bottom:5px;"><i class="fa-regular fa-calendar"></i> ${date || ''}</p>
+                <h3 style="color:var(--primary-color); line-height:1.4;">${description || ''}</h3>
+            </div>
+        </div>
+    `;
+
+    openModal(bodyHtml);
 }
 
 /* =========================================
