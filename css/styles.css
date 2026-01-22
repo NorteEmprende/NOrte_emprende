@@ -810,7 +810,7 @@ footer {
 .evaluation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
+    gap: 35px;
     margin-top: 30px;
 }
 
@@ -821,6 +821,11 @@ footer {
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-left: 4px solid var(--primary-color);
+    margin-top: 20px;
+}
+
+.evaluation-card:first-child {
+    margin-top: 0;
 }
 
 .evaluation-card:hover {
@@ -853,9 +858,15 @@ footer {
 .evaluation-card-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--secondary-color);
+    color: var(--primary-color);
     margin: 0;
     line-height: 1.4;
+}
+
+.evaluation-card-title i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    font-size: 1rem;
 }
 
 .evaluation-card-body {
