@@ -754,6 +754,58 @@ footer {
     font-size: 1.2rem;
 }
 
+/* Info Heading - Beautiful Section Header */
+.info-heading {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #c92a3e 100%);
+    color: var(--white);
+    padding: 20px 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 20px rgba(170, 25, 45, 0.25);
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-heading:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(170, 25, 45, 0.35);
+}
+
+.info-heading i {
+    font-size: 1.8rem;
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 12px;
+    border-radius: 50%;
+    min-width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+    .info-heading {
+        flex-direction: row;
+        gap: 12px;
+        padding: 18px 20px;
+        font-size: 1rem;
+    }
+
+    .info-heading i {
+        font-size: 1.5rem;
+        min-width: 42px;
+        height: 42px;
+        padding: 10px;
+    }
+}
+
 /* Grids */
 .cards-grid,
 .gallery-grid {
