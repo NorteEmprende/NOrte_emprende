@@ -11,19 +11,23 @@ async function initApp() {
     setupSmoothScroll();
 
     // 3. Dynamic Counter
-    updateCounter();
+    const counterEl = document.getElementById('postulaciones-count');
+    if (counterEl) updateCounter();
 
-    // 4. Load Dynamic Content (CSV)
-    loadFromCSV();
+    // 4. Load Dynamic Content (CSV) - Comunidad
+    const communityGrid = document.getElementById('emprendimientos-grid');
+    if (communityGrid) loadComunidadFromCSV();
 
     // 5. Setup Modal Close Listeners
     setupModalListeners();
 
     // 6. Init Map
-    initMap();
+    const mapEl = document.getElementById('map');
+    if (mapEl) initMap();
 
-    // 7. Load Vitrina
-    loadVitrina();
+    // 7. Load Vitrina (Main Page Version)
+    const vitrinaGrid = document.getElementById('vitrina-grid');
+    if (vitrinaGrid) loadVitrina();
 }
 
 /* =========================================
@@ -142,37 +146,82 @@ function initMap() {
    Data Loading & Rendering (Refactored)
    ========================================= */
 
-// Regex based CSV parser to handle quoted strings containing commas
-function parseCSVLine(line) {
-    const matches = [];
-    let current = '';
+// Robust CSV parser to handle quoted strings, internal commas, and multi-line values
+function parseRobustCSV(csvText) {
+    const result = [];
+    let row = [];
+    let cell = '';
     let inQuote = false;
 
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
+    for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
         if (char === '"') {
-            inQuote = !inQuote;
+            if (inQuote && nextChar === '"') {
+                cell += '"';
+                i++; // Skip the double quote
+            } else {
+                inQuote = !inQuote;
+            }
         } else if (char === ',' && !inQuote) {
-            matches.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-            current = '';
+            row.push(cell.trim());
+            cell = '';
+        } else if ((char === '\r' || char === '\n') && !inQuote) {
+            if (cell !== '' || row.length > 0) {
+                row.push(cell.trim());
+                result.push(row);
+                cell = '';
+                row = [];
+            }
+            if (char === '\r' && nextChar === '\n') i++; // Handle CRLF
         } else {
-            current += char;
+            cell += char;
         }
     }
-    matches.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-    return matches;
+
+    if (cell !== '' || row.length > 0) {
+        row.push(cell.trim());
+        result.push(row);
+    }
+
+    return result;
+}
+
+// Helper to shuffle array (Fisher-Yates) for randomness
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[array[j]]] = [array[array[j]], array[i]];
+    }
+    return array;
+}
+
+// Keep the single line parser as legacy if needed, but we'll use robust one
+function parseCSVLine(line) {
+    return parseRobustCSV(line)[0] || [];
+}
+
+function convertDriveLink(url) {
+    if (!url) return '';
+    // If it's already a direct link or not a drive link, return as is
+    if (url.includes('drive.google.com/uc?id=')) return url;
+
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+        return `https://drive.google.com/uc?id=${match[1]}`;
+    }
+    return url;
 }
 
 function getThumbnailUrl(url) {
     if (!url) return null;
 
-    // Check for Drive URL
     const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
     if (driveMatch) {
         return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w800`;
     }
 
-    // Return original if it looks like an image URL
     if (url.match(/^http/)) {
         return url;
     }
@@ -185,96 +234,129 @@ function extractDriveId(url) {
     return match ? match[1] : null;
 }
 
-/* --- Comunidad Emprendedora --- */
+/* --- Comunidad Emprendedora (Debugging & Refinement) --- */
 
-async function loadFromCSV() {
-    // NEW CSV URL (Public 13-col)
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQM7r71LCUyKGJCORV6_7ezdd7fbuKRMySpH9R9S9nOREM775GJYKM7Ml9_ufiVK17d1Ww9tEWN8Y_T/pub?gid=0&single=true&output=csv';
+async function loadComunidadFromCSV() {
+    // FIXED LINK - DO NOT CHANGE ESTRUCTURA
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0Zd-9e02hdTaUymNBaLKzphvDrcahiaUs7gmHe9Lup1_FURxAnXV6aLdH3PciBGy_2upZocBtFOtz/pub?gid=0&single=true&output=csv';
     const container = document.getElementById('emprendimientos-grid');
 
+    if (!container) return;
+
+    console.log(">>> [Comunidad] Iniciando carga de datos...");
+
     try {
-        const response = await fetch(csvUrl);
+        // Cache-busting to always get fresh data
+        const response = await fetch(csvUrl + "&_=" + Date.now());
         const text = await response.text();
-        const lines = text.split('\n').filter(l => l.trim() !== '');
 
-        // Skip header
-        const rows = lines.slice(1);
+        // 1. RAW PARSE
+        const allRows = parseRobustCSV(text);
+        console.log(`>>> [Comunidad] Filas detectadas en total (incluyendo header): ${allRows.length}`);
 
+        if (allRows.length > 0) {
+            console.log(">>> [Comunidad] Header detectado:", allRows[0]);
+        }
+
+        const dataRows = allRows.slice(1); // Skip header
         container.innerHTML = '';
 
-        if (rows.length === 0) {
-            container.innerHTML = '<p class="text-center" style="grid-column:1/-1">No hay contenido aún.</p>';
+        let discardedCount = 0;
+        let validEntries = [];
+
+        // 2. ROBUST FILTER & MAPPING (RELAXED VALIDATION)
+        // Indices A->O (0-14)
+        dataRows.forEach((cols, index) => {
+            // Filter empty lines
+            if (cols.length === 0 || (cols.length === 1 && cols[0] === '')) return;
+
+            // Technical Validation: Must have at least 10 columns (0 to 9)
+            // Indices 10 to 14 are optional (trailing empty cells or redes sociales)
+            if (cols.length < 10) {
+                console.warn(`[Fila ${index + 2}] Descartada: Columnas insuficientes (${cols.length}/10)`);
+                discardedCount++;
+                return;
+            }
+
+            // UX Validation: Check mandatory fields
+            // Index 1: Entrepreneur Name, Index 5: Business Name, Index 9: Municipality
+            if (!cols[1] || cols[1].trim() === '' || !cols[5] || cols[5].trim() === '' || !cols[9] || cols[9].trim() === '') {
+                console.warn(`[Fila ${index + 2}] Descartada: Faltan campos obligatorios (nombre/negocio/muni)`);
+                discardedCount++;
+                return;
+            }
+
+            const data = {
+                // Entrepreneur Info (Cols 1-4)
+                emprendedorNombre: cols[1].trim(),
+                emprendedorBio: cols[2] || '',
+                emprendedorVideo: cols[3] || '',
+                emprendedorFoto: convertDriveLink(cols[4]),
+
+                // Business Info (Cols 5-9)
+                negocioNombre: cols[5].trim(),
+                negocioDesc: cols[6] || '',
+                negocioTipo: cols[7] || '',
+                negocioDireccion: cols[8] || '',
+                municipio: normalizeText(cols[9]),
+
+                // Optional Info (Cols 10-11)
+                negocioImg: cols[10] ? convertDriveLink(cols[10]) : '', // Protagonist for Card
+                negocioVideo: cols[11] || '',
+
+                // Social Links (Cols 12-14)
+                tiktok: cols[12] || '',
+                instagram: cols[13] || '',
+                facebook: cols[14] || ''
+            };
+
+            validEntries.push(data);
+        });
+
+        console.log(`>>> [Comunidad] Carga completada. Válidos: ${validEntries.length} | Descartados: ${discardedCount}`);
+        if (validEntries.length > 0) {
+            console.log(">>> [Comunidad] Ejemplo de las primeras filas parseadas:", validEntries.slice(0, 2));
+        }
+
+        if (validEntries.length === 0) {
+            container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No hay emprendedores disponibles con información completa en este momento.</p>';
             return;
         }
 
-        rows.forEach(row => {
-            const cols = parseCSVLine(row);
-            // We expect 13 columns, but let's be safe with at least 9 (Video matches index 8)
-            if (cols.length < 9) return;
-
-            // Map Columns by Index
-            const data = {
-                municipio: cols[0],
-                direccion: cols[1],
-                telefono: cols[2],
-                correo: cols[3],
-                nombre: cols[4],
-                fecha: cols[5],
-                tipo: cols[6],
-                productos: cols[7],
-                videoUrl: cols[8], // Drive Link
-                instagram: cols[9],
-                facebook: cols[10],
-                tiktok: cols[11],
-                whatsapp: cols[12]
-            };
-
-            // Only render if video/image URL exists (as per general rule? or always?)
-            // User: "Si el link no es video válido → fallback visual (imagen genérica)"
-            // So we render always.
-
+        // 3. RENDER
+        validEntries.forEach(data => {
             container.appendChild(createCommunityCard(data));
         });
 
     } catch (err) {
-        console.error('Error Comunidad:', err);
-        container.innerHTML = '<p class="text-center error">Error cargando información.</p>';
+        console.error('>>> [Comunidad] Error Fatal:', err);
+        container.innerHTML = '<p class="text-center error" style="grid-column: 1/-1;">Error crítico cargando la comunidad. Verifique la consola.</p>';
     }
 }
 
 function createCommunityCard(data) {
     const div = document.createElement('div');
     div.className = 'emprendimiento-card';
-    div.style.cursor = 'pointer';
 
-    // Thumbnail Logic (Drive Video -> Image)
-    const thumbUrl = getThumbnailUrl(data.videoUrl);
-    // Fallback image if no thumb
-    const imgSrc = thumbUrl || 'img/LOGO NEXT GEN .png';
-    const imgStyle = thumbUrl ? 'object-fit:cover;' : 'object-fit:contain; padding:20px;';
-
-    const safeNombre = escapeHtml(data.nombre || 'Emprendimiento');
-    const safeMuni = escapeHtml(data.municipio || '');
-    const safeTipo = escapeHtml(data.tipo || '');
+    // Protagonist Image (Col 10-Business Img)
+    const imgSrc = data.negocioImg || 'img/LOGO NEXT GEN .png';
+    const safeNombre = escapeHtml(data.negocioNombre);
+    const safeMuni = escapeHtml(data.municipio);
+    const safeTipo = escapeHtml(data.negocioTipo);
 
     div.innerHTML = `
-        <div class="video-thumbnail" style="background:#f4f4f4; position:relative; height:200px; overflow:hidden;">
-            <img src="${imgSrc}" alt="${safeNombre}" loading="lazy" style="width:100%; height:100%; ${imgStyle}">
-            ${thumbUrl ? '<div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.6); color:white; padding:5px 10px; border-radius:20px; font-size:0.8rem;"><i class="fa-solid fa-play"></i></div>' : ''}
+        <div class="video-thumbnail">
+            <span class="card-tag">${safeMuni}</span>
+            <img src="${imgSrc}" alt="${safeNombre}" loading="lazy">
         </div>
-        <div class="card-info" style="padding:15px; text-align:left;">
-            <span style="font-size:0.75rem; color:var(--primary-color); font-weight:600; text-transform:uppercase; letter-spacing:1px;">${safeMuni}</span>
-            <h3 style="font-size:1.1rem; margin:5px 0; font-weight:700; line-height:1.3;">${safeNombre}</h3>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">${safeTipo}</p>
-            <button class="btn btn-sm" style="width:100%; padding:8px; font-size:0.9rem; border:1px solid #ddd; background:transparent; color:#333; transition:0.3s; border-radius:4px;">Ver Detalle</button>
+        <div class="card-info">
+            <div class="card-text-group">
+                <h3>${safeNombre}</h3>
+                <p class="category">${safeTipo}</p>
+            </div>
+            <button class="btn-card-outline">Ver Perfil Completo</button>
         </div>
     `;
-
-    // Hover effect for button via JS or relying on CSS if present. 
-    // Adding simple inline hover for the button:
-    const btn = div.querySelector('button');
-    div.addEventListener('mouseenter', () => { btn.style.background = 'var(--primary-color)'; btn.style.color = 'white'; btn.style.border = '1px solid var(--primary-color)'; });
-    div.addEventListener('mouseleave', () => { btn.style.background = 'transparent'; btn.style.color = '#333'; btn.style.border = '1px solid #ddd'; });
 
     div.addEventListener('click', () => {
         openCommunityModal(data);
@@ -284,97 +366,158 @@ function createCommunityCard(data) {
 }
 
 function openCommunityModal(data) {
-    const driveId = extractDriveId(data.videoUrl);
-    let mediaHtml = '';
+    const safeENombre = escapeHtml(data.emprendedorNombre);
+    const safeNNombre = escapeHtml(data.negocioNombre);
+    const safeMuni = escapeHtml(data.municipio);
+    const safeTipo = escapeHtml(data.negocioTipo);
+    const safeNDesc = escapeHtml(data.negocioDesc);
+    const safeEBio = escapeHtml(data.emprendedorBio);
+    const safeDir = escapeHtml(data.negocioDireccion);
 
-    if (driveId) {
-        mediaHtml = `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:20px;">
-            <iframe src="https://drive.google.com/file/d/${driveId}/preview" 
-            style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
-        </div>`;
-    } else {
-        mediaHtml = `<div style="padding:40px; text-align:center; background:#f9f9f9; border-radius:8px; margin-bottom:20px; color:#999;">
-            <i class="fa-regular fa-image" style="font-size:3rem; margin-bottom:10px;"></i>
-            <p>Vista previa no disponible</p>
-        </div>`;
-    }
+    const eDriveId = extractDriveId(data.emprendedorVideo);
+    const nDriveId = extractDriveId(data.negocioVideo);
+    const eFoto = data.emprendedorFoto || 'img/LOGO NEXT GEN .png';
 
-    // Socials
-    let socialsHtml = '';
+    // Socials Logic
     const socialLinks = [
-        { key: 'instagram', icon: 'fa-instagram', color: '#E1306C', url: data.instagram },
-        { key: 'facebook', icon: 'fa-facebook', color: '#1877F2', url: data.facebook },
-        { key: 'tiktok', icon: 'fa-tiktok', color: '#000000', url: data.tiktok },
-        { key: 'whatsapp', icon: 'fa-whatsapp', color: '#25D366', url: data.whatsapp ? `https://wa.me/${data.whatsapp.replace(/\D/g, '')}` : '' }
+        { icon: 'fa-instagram', color: '#E1306C', url: data.instagram },
+        { icon: 'fa-facebook', color: '#1877F2', url: data.facebook },
+        { icon: 'fa-tiktok', color: '#000000', url: data.tiktok }
     ];
 
-    socialLinks.forEach(item => {
-        if (item.url && item.url.length > 3) {
-            socialsHtml += `<a href="${item.url}" target="_blank" style="color:${item.color}; font-size:1.8rem; margin:0 10px; text-decoration:none;">
-                <i class="fa-brands ${item.icon}"></i>
-            </a>`;
-        }
-    });
+    let socialsHtml = socialLinks
+        .filter(s => s.url && s.url.length > 5)
+        .map(s => `<a href="${s.url}" target="_blank" style="color:${s.color}; font-size:1.6rem; transition: transform 0.3s ease;"><i class="fa-brands ${s.icon}"></i></a>`)
+        .join('');
 
     const contentHtml = `
-        <div style="text-align:left; max-width:900px; margin:0 auto;">
-            <!-- Header -->
-            <div style="margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
-                <span style="background:var(--primary-color); color:white; padding:4px 10px; border-radius:4px; font-size:0.8rem; text-transform:uppercase;">${escapeHtml(data.municipio)}</span>
-                <h2 style="margin:10px 0 5px; font-size:1.8rem; color:var(--secondary-color);">${escapeHtml(data.nombre)}</h2>
-                <p style="color:#666; font-style:italic; font-size:1rem;">${escapeHtml(data.tipo)}</p>
+        <div class="community-modal-container">
+            <!-- Modal Internal Header (Tabs) -->
+            <div class="community-modal-nav">
+                <button class="community-modal-tab-btn active" onclick="switchCommunityView('entrepreneur')">
+                    <i class="fa-solid fa-user-tie"></i> Emprendedor
+                </button>
+                <button class="community-modal-tab-btn" onclick="switchCommunityView('business')">
+                    <i class="fa-solid fa-rocket"></i> Emprendimiento
+                </button>
             </div>
 
-            <div class="modal-grid" style="display:grid; grid-template-columns: 1.5fr 1fr; gap:30px;">
-                <!-- Left: Media & Desc -->
-                <div>
-                    ${mediaHtml}
-                    
-                    <h4 style="color:var(--secondary-color); margin-bottom:10px; border-left:3px solid var(--primary-color); padding-left:10px;">Sobre Nosotros</h4>
-                    <p style="white-space:pre-wrap; line-height:1.6; color:#444; font-size:0.95rem;">${escapeHtml(data.productos)}</p>
-                    
-                    <div style="margin-top:20px; font-size:0.9rem; color:#777;">
-                        <i class="fa-solid fa-calendar"></i> Activo desde: ${escapeHtml(data.fecha)}
+            <!-- Scrollable Body Content -->
+            <div class="community-modal-scrollable">
+                
+                <!-- View 1: Entrepreneur (Default) -->
+                <div id="view-entrepreneur" class="community-modal-view active">
+                    <div class="modal-profile-header">
+                        <img src="${eFoto}" class="modal-profile-img" alt="${safeENombre}">
+                        <div class="modal-profile-info">
+                            <span class="subtitle"><i class="fa-solid fa-location-dot"></i> ${safeMuni}</span>
+                            <h4>${safeENombre}</h4>
+                            <p class="role-badge">Perfil Institucional NextGen</p>
+                        </div>
                     </div>
+                    
+                    <h5 class="modal-section-title">Trayectoria Profesional</h5>
+                    <p class="modal-text-content">${safeEBio}</p>
+
+                    ${eDriveId ? `
+                        <h5 class="modal-section-title">Video de Presentación</h5>
+                        <div class="modal-video-container">
+                            <iframe src="https://drive.google.com/file/d/${eDriveId}/preview" allowfullscreen></iframe>
+                        </div>
+                    ` : data.emprendedorVideo ? `
+                        <h5 class="modal-section-title">Video de Presentación</h5>
+                        <div class="text-center mt-3">
+                            <a href="${data.emprendedorVideo}" target="_blank" class="btn btn-secondary">
+                                <i class="fa-solid fa-play"></i> Ver video externo
+                            </a>
+                        </div>
+                    ` : ''}
                 </div>
 
-                <!-- Right: Contact -->
-                <div style="background:#f8f9fa; padding:20px; border-radius:8px; height:fit-content; border:1px solid #eee;">
-                    <h4 style="color:var(--secondary-color); margin-bottom:15px; text-transform:uppercase; font-size:0.9rem; letter-spacing:1px; font-weight:700;">Contacto</h4>
-                    
-                    <div style="display:flex; flex-direction:column; gap:12px; font-size:0.9rem;">
-                        ${data.direccion ? `<div><i class="fa-solid fa-location-dot" style="width:20px; color:var(--primary-color);"></i> ${escapeHtml(data.direccion)}</div>` : ''}
-                        ${data.telefono ? `<div><i class="fa-solid fa-phone" style="width:20px; color:var(--primary-color);"></i> <a href="tel:${data.telefono}" style="color:#333;">${escapeHtml(data.telefono)}</a></div>` : ''}
-                        ${data.correo ? `<div><i class="fa-solid fa-envelope" style="width:20px; color:var(--primary-color);"></i> <a href="mailto:${data.correo}" style="color:#333; word-break:break-all;">${escapeHtml(data.correo)}</a></div>` : ''}
+                <!-- View 2: Business -->
+                <div id="view-business" class="community-modal-view">
+                    <div class="business-header">
+                        <h2>${safeNNombre}</h2>
+                        <span class="business-tag">${safeTipo}</span>
                     </div>
-
-                    <!-- Socials -->
-                    <div style="margin-top:25px; pt-3; border-top:1px solid #ddd; text-align:center;">
-                        <p style="margin-bottom:15px; font-size:0.85rem; color:#888;">Síguenos en redes</p>
-                        <div style="display:flex; justify-content:center; flex-wrap:wrap;">
-                            ${socialsHtml || '<span style="font-size:0.8rem; color:#aaa;">No disponibles</span>'}
+                    
+                    <div class="business-grid">
+                        <div class="business-main">
+                            <h5 class="modal-section-title">Propuesta de Valor</h5>
+                            <p class="modal-text-content">${safeNDesc}</p>
+                            
+                            ${nDriveId ? `
+                                <h5 class="modal-section-title">Galería y Actividades</h5>
+                                <div class="modal-video-container">
+                                    <iframe src="https://drive.google.com/file/d/${nDriveId}/preview" allowfullscreen></iframe>
+                                </div>
+                            ` : data.negocioVideo ? `
+                                <div class="text-center mt-3">
+                                    <a href="${data.negocioVideo}" target="_blank" class="btn btn-secondary">
+                                        <i class="fa-solid fa-play"></i> Ver video del negocio
+                                    </a>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="business-sidebar">
+                            <div class="info-card">
+                                <h5 class="modal-section-title no-border">Información</h5>
+                                <div class="sidebar-item">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                    <div>
+                                        <p class="label">Ubicación</p>
+                                        <p class="value">${safeDir}</p>
+                                        <p class="value-muni">${safeMuni}, Norte de Santander</p>
+                                    </div>
+                                </div>
+                                
+                                <h5 class="modal-section-title no-border">Redes Sociales</h5>
+                                <div class="social-icons-row">
+                                    ${socialsHtml || '<span class="no-socials">No registradas</span>'}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Mobile Responsive Fix (Inline) -->
-            <style>
-                @media (max-width: 768px) {
-                    .modal-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
-                }
-            </style>
+
+            <div class="community-modal-footer">
+                <button class="btn btn-secondary close-vitrina-modal">
+                    Volver a la Galería
+                </button>
+            </div>
         </div>
     `;
 
     openModal(contentHtml);
+
+    // Setup close button properly since it's injected
+    const clBtn = document.querySelector('.close-vitrina-modal');
+    if (clBtn) clBtn.onclick = closeModal;
+}
+
+// Global helper for view switching within social modal
+window.switchCommunityView = function (viewName) {
+    const tabs = document.querySelectorAll('.community-modal-tab-btn');
+    const views = document.querySelectorAll('.community-modal-view');
+
+    tabs.forEach(t => t.classList.remove('active'));
+    views.forEach(v => v.classList.remove('active'));
+
+    if (viewName === 'entrepreneur') {
+        tabs[0].classList.add('active');
+        document.getElementById('view-entrepreneur').classList.add('active');
+    } else {
+        tabs[1].classList.add('active');
+        document.getElementById('view-business').classList.add('active');
+    }
 }
 
 /* --- Vitrina NextGen --- */
 
 async function loadVitrina() {
-    // CORRECT URL: direct pub csv export
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR47D7VTJJ_9R2D9XJ9g7o5LOmSn8btq2pyAaHBEZpwxp9Nt4aonVSNY__b5EUAifASAsahzYoMLFtD/pub?gid=0&single=true&output=csv';
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoXg_RmaJauLIOX_6OyFrncfQZhbPBOXqT4eiaQeThlN4H2Sjx4OgNZbykUC0VyIRiguVL4FMFcXo_/pub?gid=0&single=true&output=csv';
     const container = document.getElementById('vitrina-grid');
 
     if (!container) return;
@@ -382,77 +525,113 @@ async function loadVitrina() {
     try {
         const response = await fetch(csvUrl);
         const text = await response.text();
-        const lines = text.split('\n').filter(l => l.trim() !== '');
-
-        // Skip header? 
-        // Sheet: [Fecha] [Mensaje] [Adjunto]
-        // Usually export includes headers. Let's try skipping first row.
-        const rows = lines.slice(1);
+        // 1. RAW PARSE
+        const allRows = parseRobustCSV(text);
+        const dataRows = allRows.slice(1); // Skip header
 
         container.innerHTML = '';
 
-        let hasContent = false;
+        // 2. ROBUST FILTER & MAPPING
+        // We clean and normalize data BEFORE anything else
+        const validNoticias = dataRows.map(cols => {
+            // Must have min 6 columns and basic required fields (Title, Municipio, Description)
+            if (cols.length < 6) return null;
+            if (!cols[1] || cols[1].trim() === '' || !cols[2] || cols[2].trim() === '') return null;
 
-        rows.forEach(row => {
-            const cols = parseCSVLine(row);
-            // Expected: [Fecha, Mensaje, URL] (Col A, B, C)
-            if (cols.length < 3) return;
+            return {
+                titulo: cols[1].trim(),
+                municipio: normalizeText(cols[2]),
+                descripcion: cols[3] || '',
+                imgUrl: convertDriveLink(cols[4]),
+                fecha: cols[5] || ''
+            };
+        }).filter(item => item !== null);
 
-            const fecha = cols[0].replace(/^"|"$/g, '').trim();
-            const descripcion = cols[1].replace(/^"|"$/g, '').trim();
-            const imgUrl = cols[2].replace(/^"|"$/g, '').trim(); // Col C
-
-            // Only render if we have a URL
-            if (imgUrl) {
-                container.appendChild(createVitrinaCard(imgUrl, descripcion, fecha));
-                hasContent = true;
-            }
-        });
-
-        if (!hasContent) {
-            // Leave empty as requested? Or basic message?
-            // User asked to remove "Próximamente" message.
+        if (validNoticias.length === 0) {
+            container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No hay noticias disponibles en este momento.</p>';
+            return;
         }
+
+        // 3. RANDOM SELECTION (Only on valid data)
+        const shuffled = shuffleArray([...validNoticias]);
+        const selected = shuffled.slice(0, 10);
+
+        // 4. RENDER
+        selected.forEach(data => {
+            container.appendChild(createVitrinaCard(data));
+        });
 
     } catch (err) {
         console.error('Error Vitrina:', err);
+        container.innerHTML = '<p class="text-center error" style="grid-column: 1/-1;">Error cargando la vitrina.</p>';
     }
 }
 
-function createVitrinaCard(imgUrl, descripcion, fecha) {
+function createVitrinaCard(data) {
     const div = document.createElement('div');
-    div.className = 'emprendimiento-card';
-    div.style.cursor = 'pointer';
+    div.className = 'vitrina-card';
 
-    // Thumbnail logic
-    const thumbUrl = getThumbnailUrl(imgUrl);
-
-    // STRICT RULE: No Logo Fallback
-    let imgHtml = '';
-    if (thumbUrl) {
-        imgHtml = `<img src="${thumbUrl}" alt="Vitrina" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block;">`;
-    } else {
-        imgHtml = `<div style="width:100%; height:100%; background:#eee;"></div>`;
-    }
-
-    const safeDesc = escapeHtml(descripcion);
-    const safeFecha = escapeHtml(fecha);
+    const imgSrc = data.imgUrl || 'img/LOGO NEXT GEN .png';
+    const safeTitulo = escapeHtml(data.titulo);
+    const safeMuni = escapeHtml(data.municipio);
+    const safeFecha = escapeHtml(data.fecha);
 
     div.innerHTML = `
-        <div class="video-thumbnail" style="background:#f4f4f4; position:relative; overflow:hidden;">
-             ${imgHtml}
+        <div class="vitrina-card-img">
+            <img src="${imgSrc}" alt="${safeTitulo}" loading="lazy">
+            <div class="vitrina-card-tag">${safeMuni}</div>
         </div>
-        <div class="card-info">
-            <small style="color:#999;">${safeFecha}</small>
-            <h3 style="font-size:1rem; margin-top:5px;">${safeDesc.substring(0, 80)}${safeDesc.length > 80 ? '...' : ''}</h3>
+        <div class="vitrina-card-content">
+            <span class="vitrina-card-date"><i class="fa-regular fa-calendar"></i> ${safeFecha}</span>
+            <h3 class="vitrina-card-title">${safeTitulo}</h3>
+            <div class="vitrina-card-footer">
+                <span>Leer más <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
         </div>
     `;
 
     div.addEventListener('click', () => {
-        openMediaModal(imgUrl, safeDesc, safeFecha);
+        openVitrinaModal(data);
     });
 
     return div;
+}
+
+function openVitrinaModal(data) {
+    const safeTitulo = escapeHtml(data.titulo);
+    const safeMuni = escapeHtml(data.municipio);
+    const safeFecha = escapeHtml(data.fecha);
+    const safeDesc = escapeHtml(data.descripcion);
+    const imgSrc = data.imgUrl || 'img/LOGO NEXT GEN .png';
+
+    const contentHtml = `
+        <div class="vitrina-modal-container">
+            <div class="vitrina-modal-header">
+                <div class="vitrina-modal-featured-img">
+                    <img src="${imgSrc}" alt="${safeTitulo}">
+                </div>
+                <div class="vitrina-modal-meta">
+                    <span class="m-tag"><i class="fa-solid fa-location-dot"></i> ${safeMuni}</span>
+                    <span class="d-tag"><i class="fa-regular fa-calendar"></i> ${safeFecha}</span>
+                </div>
+                <h2 class="vitrina-modal-title">${safeTitulo}</h2>
+            </div>
+            <div class="vitrina-modal-body">
+                <p class="vitrina-modal-description">${safeDesc}</p>
+            </div>
+            <div class="vitrina-modal-footer">
+                <button class="btn btn-secondary close-vitrina-modal">Cerrar / Volver</button>
+            </div>
+        </div>
+    `;
+
+    openModal(contentHtml);
+
+    // Setup internal close button
+    const closeBtn = document.querySelector('.close-vitrina-modal');
+    if (closeBtn) {
+        closeBtn.onclick = () => closeModal();
+    }
 }
 
 /* --- Shared Modal Logic --- */
@@ -535,4 +714,26 @@ function escapeHtml(text) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+// Normalize text for consistency (Simple Trim to preserve composite casing)
+function normalizeText(text) {
+    if (!text) return '';
+    return text.trim();
+}
+// Global helper for view switching within comunidad modal
+window.switchCommunityView = function (viewName) {
+    const tabs = document.querySelectorAll('.community-modal-tab-btn');
+    const views = document.querySelectorAll('.community-modal-view');
+
+    tabs.forEach(t => t.classList.remove('active'));
+    views.forEach(v => v.classList.remove('active'));
+
+    if (viewName === 'entrepreneur') {
+        tabs[0].classList.add('active');
+        document.getElementById('view-entrepreneur').classList.add('active');
+    } else {
+        tabs[1].classList.add('active');
+        document.getElementById('view-business').classList.add('active');
+    }
 }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Noticias - NextGen Emprende NDS</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        .filter-section {
+            margin: 0 auto 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background: #fff;
+            padding: 25px 35px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: fit-content;
+            border: 1px solid #eee;
+        }
+
+        .filter-label {
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .select-filter {
+            padding: 12px 25px;
+            border-radius: 30px;
+            border: 2px solid #eee;
+            font-family: var(--font-body);
+            min-width: 280px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            appearance: none;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AA192D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 20px center / 15px;
+            outline: none;
+        }
+
+        .select-filter:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(170, 25, 45, 0.1);
+        }
+
+        .page-header {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('img/Banner.png') center/cover;
+            padding: 120px 0 80px;
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary-color);
+        }
+
+        .page-header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .editorial-cta {
+            box-shadow: 0 10px 25px rgba(170, 25, 45, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .editorial-cta:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(170, 25, 45, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Modal for News (Shared ID with app.js logic) -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Ribbon -->
+    <div class="top-ribbon">
+        <p>Fortaleciendo el Emprendimiento Juvenil – Norte de Santander 2026</p>
+    </div>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <div class="header-logos">
+                    <img src="img/LOGO SDEYP..png" alt="SDEYP">
+                    <img src="img/LOGO NEXT GEN .png" alt="NextGen">
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#hero">Inicio</a></li>
+                    <li><a href="index.html#proyecto">Nuestro Proyecto</a></li>
+                    <li><a href="index.html#criterios">Postúlate</a></li>
+                    <li><a href="index.html#comunidad">Comunidad</a></li>
+                    <li><a href="index.html#vitrina">Vitrina</a></li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Histórico de Noticias</h1>
+                <p>Explora todas las actividades y novedades del programa NextGen</p>
+            </div>
+        </section>
+
+        <section class="section-padding">
+            <div class="container">
+                <!-- Filter -->
+                <div class="filter-section">
+                    <span class="filter-label"><i class="fa-solid fa-filter"></i> Filtrar por Municipio:</span>
+                    <select id="municipio-filter" class="select-filter">
+                        <option value="all">Ver todos los municipios</option>
+                    </select>
+                </div>
+
+                <div id="noticias-history-grid" class="gallery-grid">
+                    <!-- Dynamic Content Loading -->
+                    <div class="loader">Cargando histórico de noticias...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-info">
+                <h4>Gobernación de Norte de Santander</h4>
+                <p>Secretaría de Desarrollo Económico y Productividad</p>
+                <p>Email: <a href="mailto:nextgenemprendends@gmail.com">nextgenemprendends@gmail.com</a></p>
+            </div>
+        </div>
+        <div class="footer-logos">
+            <img src="img/LOGO SDEYP..png" alt="SDEYP" class="footer-logo-large">
+            <img src="img/LOGO NEXT GEN .png" alt="Next Gen" class="footer-logo-large">
+            <img src="img/Consorcio NJ.png" alt="Consorcio NJ">
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 NextGen Emprende NDS. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script> <!-- Included for shared utilities but we'll stop its auto-init -->
+    <script src="js/noticias.js"></script>
+</body>
+
+</html>
