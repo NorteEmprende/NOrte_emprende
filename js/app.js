@@ -534,16 +534,21 @@ async function loadVitrina() {
         // 2. ROBUST FILTER & MAPPING
         // We clean and normalize data BEFORE anything else
         const validNoticias = dataRows.map(cols => {
-            // Must have min 6 columns and basic required fields (Title, Municipio, Description)
+            // Must have min 6 columns and basic required fields (Title, Municipio, Description, Date)
             if (cols.length < 6) return null;
-            if (!cols[1] || cols[1].trim() === '' || !cols[2] || cols[2].trim() === '') return null;
+            // Validate: Title (1), Municipio (2), Date (5)
+            if (!cols[1] || cols[1].trim() === '' ||
+                !cols[2] || cols[2].trim() === '' ||
+                !cols[5] || cols[5].trim() === '') {
+                return null;
+            }
 
             return {
                 titulo: cols[1].trim(),
                 municipio: normalizeText(cols[2]),
                 descripcion: cols[3] || '',
                 imgUrl: convertDriveLink(cols[4]),
-                fecha: cols[5] || ''
+                fecha: cols[5].trim()
             };
         }).filter(item => item !== null);
 
@@ -552,9 +557,8 @@ async function loadVitrina() {
             return;
         }
 
-        // 3. RANDOM SELECTION (Only on valid data)
-        const shuffled = shuffleArray([...validNoticias]);
-        const selected = shuffled.slice(0, 10);
+        // 3. DETERMINISTIC SELECTION (First 5 valid items)
+        const selected = validNoticias.slice(0, Math.min(5, validNoticias.length));
 
         // 4. RENDER
         selected.forEach(data => {
