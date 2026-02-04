@@ -457,9 +457,23 @@
     </footer>
 
     <!-- WhatsApp Button -->
-    <a href="https://wa.me/573148804190" class="whatsapp-btn" target="_blank">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
+    <!-- WhatsApp Floating Action Button -->
+    <div class="whatsapp-container">
+        <div class="whatsapp-options" id="whatsapp-options">
+            <a href="https://wa.me/573148804190" target="_blank" class="wa-option">
+                <span class="wa-label">Sede Cúcuta</span>
+                <div class="wa-icon-small"><i class="fa-brands fa-whatsapp"></i></div>
+            </a>
+            <a href="https://wa.me/573183667932" target="_blank" class="wa-option">
+                <span class="wa-label">Sede Ocaña</span>
+                <div class="wa-icon-small"><i class="fa-brands fa-whatsapp"></i></div>
+            </a>
+        </div>
+        <button id="whatsapp-toggle" class="whatsapp-btn">
+            <i class="fa-brands fa-whatsapp" id="wa-main-icon"></i>
+            <i class="fa-solid fa-xmark" id="wa-close-icon" style="display: none;"></i>
+        </button>
+    </div>
 
 
 
