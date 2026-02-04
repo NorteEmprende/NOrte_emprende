@@ -209,31 +209,32 @@ function parseCSVLine(line) {
     return parseRobustCSV(line)[0] || [];
 }
 
-function convertDriveLink(url) {
-    if (!url) return '';
-    // If it's already a direct link or not a drive link, return as is
-    if (url.includes('drive.google.com/uc?id=')) return url;
+function driveToDirectImageUrl(url) {
+    const originalUrl = (url || '').trim();
+    if (!originalUrl) return 'img/LOGO NEXT GEN .png'; // Fallback immediately if empty
 
-    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-    if (match && match[1]) {
-        return `https://drive.google.com/uc?id=${match[1]}`;
-    }
-    return url;
-}
-
-function getThumbnailUrl(url) {
-    if (!url) return null;
-
-    const driveMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-    if (driveMatch) {
-        return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w800`;
+    // 1. Check if it's already a direct Google User Content URL
+    if (originalUrl.includes('lh3.googleusercontent.com') || originalUrl.includes('drive.google.com/thumbnail')) {
+        // Assume it's already good, just return it
+        return originalUrl;
     }
 
-    if (url.match(/^http/)) {
-        return url;
+    // 2. Extract ID from various Drive formats
+    // Supported: /file/d/<ID>, /open?id=<ID>, /uc?id=<ID>, id=<ID>
+    const idMatch = originalUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
+        originalUrl.match(/id=([a-zA-Z0-9_-]+)/);
+
+    if (idMatch && idMatch[1]) {
+        const fileId = idMatch[1];
+        // 3. Construct the official robust direct link
+        const finalUrl = `https://lh3.googleusercontent.com/d/${fileId}=w1200`;
+
+        console.log(`[DriveImage] Original: ${originalUrl} -> Converted: ${finalUrl}`);
+        return finalUrl;
     }
 
-    return null;
+    console.warn(`[DriveImage] Could not convert: ${originalUrl}`);
+    return 'img/LOGO NEXT GEN .png'; // Fallback if conversion fails
 }
 
 function extractDriveId(url) {
@@ -272,13 +273,13 @@ async function fetchComunidadData() {
                 emprendedorNombre: nombre,
                 emprendedorBio: cols[2] || '',
                 emprendedorVideo: cols[3] || '',
-                emprendedorFoto: convertDriveLink(cols[4]),
+                emprendedorFoto: driveToDirectImageUrl(cols[4]),
                 negocioNombre: negocio,
                 negocioDesc: cols[6] || '',
                 negocioTipo: cols[7] || 'Otro', // Default
                 negocioDireccion: cols[8] || '',
                 municipio: normalizeText(muni),
-                negocioImg: cols[10] ? convertDriveLink(cols[10]) : '',
+                negocioImg: driveToDirectImageUrl(cols[10]),
                 negocioVideo: cols[11] || '',
                 tiktok: cols[12] || '',
                 instagram: cols[13] || '',
@@ -423,7 +424,8 @@ function createCommunityCard(data) {
     div.innerHTML = `
         <div class="video-thumbnail">
             <span class="card-tag">${safeMuni}</span>
-            <img src="${imgSrc}" alt="${safeNombre}" loading="lazy">
+            <img src="${imgSrc}" alt="${safeNombre}" loading="lazy" 
+                 onerror="this.onerror=null; this.src='img/LOGO NEXT GEN .png'; this.style.objectFit='contain'; this.style.backgroundColor='#f4f4f4';">
         </div>
         <div class="card-info">
             <div class="card-text-group">
@@ -484,7 +486,8 @@ function openCommunityModal(data) {
                 <!-- View 1: Entrepreneur (Default) -->
                 <div id="view-entrepreneur" class="community-modal-view active">
                     <div class="modal-profile-header">
-                        <img src="${eFoto}" class="modal-profile-img" alt="${safeENombre}">
+                        <img src="${eFoto}" class="modal-profile-img" alt="${safeENombre}"
+                             onerror="this.onerror=null; this.src='img/LOGO NEXT GEN .png'; this.style.backgroundColor='#fff';">
                         <div class="modal-profile-info">
                             <span class="subtitle"><i class="fa-solid fa-location-dot"></i> ${safeMuni}</span>
                             <h4>${safeENombre}</h4>
@@ -623,7 +626,7 @@ async function loadVitrina() {
                 titulo: cols[1].trim(),
                 municipio: normalizeText(cols[2]),
                 descripcion: cols[3] || '',
-                imgUrl: convertDriveLink(cols[4]),
+                imgUrl: driveToDirectImageUrl(cols[4]),
                 fecha: cols[5].trim()
             };
         }).filter(item => item !== null);
@@ -658,7 +661,8 @@ function createVitrinaCard(data) {
 
     div.innerHTML = `
         <div class="vitrina-card-img">
-            <img src="${imgSrc}" alt="${safeTitulo}" loading="lazy">
+            <img src="${imgSrc}" alt="${safeTitulo}" loading="lazy"
+                 onerror="this.onerror=null; this.src='img/LOGO NEXT GEN .png'; this.style.objectFit='contain'; this.style.backgroundColor='#f4f4f4';">
             <div class="vitrina-card-tag">${safeMuni}</div>
         </div>
         <div class="vitrina-card-content">
@@ -688,7 +692,8 @@ function openVitrinaModal(data) {
         <div class="vitrina-modal-container">
             <div class="vitrina-modal-header">
                 <div class="vitrina-modal-featured-img">
-                    <img src="${imgSrc}" alt="${safeTitulo}">
+                    <img src="${imgSrc}" alt="${safeTitulo}"
+                         onerror="this.onerror=null; this.src='img/LOGO NEXT GEN .png'; this.style.objectFit='contain'; this.style.backgroundColor='#f4f4f4';">
                 </div>
                 <div class="vitrina-modal-meta">
                     <span class="m-tag"><i class="fa-solid fa-location-dot"></i> ${safeMuni}</span>
