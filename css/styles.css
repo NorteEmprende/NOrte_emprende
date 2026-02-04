@@ -1853,3 +1853,145 @@ footer {
 #chatbase-bubble-button {
     display: none !important;
 }
+
+/* =========================================
+   Rutas NextGen Styles
+   ========================================= */
+.rutas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.ruta-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid #eee;
+}
+
+.ruta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.ruta-header {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 20px;
+    text-align: center;
+}
+
+.ruta-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.ruta-body {
+    padding: 0;
+}
+
+.ruta-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ruta-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95rem;
+}
+
+.ruta-list li:last-child {
+    border-bottom: none;
+}
+
+.r-date {
+    color: #666;
+    font-weight: 500;
+}
+
+.r-date i,
+.r-muni i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+.r-muni {
+    font-weight: 700;
+    color: var(--secondary-color);
+    text-align: right;
+}
+
+.ruta-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+}
+
+.ruta-empty i {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+@media (max-width: 600px) {
+    .ruta-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .r-muni {
+        text-align: left;
+    }
+}
+
+/* =========================================
+   Community Filters
+   ========================================= */
+.filters-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.filter-group select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #555;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    border-color: var(--primary-color);
+    background-color: white;
+}

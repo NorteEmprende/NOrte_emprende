@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad Emprendedora - NextGen Emprende NDS</title>
+    <meta name="description" content="Conoce a todos los emprendedores del proyecto NextGen Emprende NDS.">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- Modal for Video/Image (Shared) -->
+    <div id="media-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Ribbon -->
+    <div class="top-ribbon">
+        <p>Fortaleciendo el Emprendimiento Juvenil – Norte de Santander 2026</p>
+    </div>
+
+    <!-- Header -->
+    <header id="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <div class="header-logos">
+                    <img src="img/LOGO SDEYP..png" alt="SDEYP">
+                    <img src="img/LOGO NEXT GEN .png" alt="NextGen">
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="index.html#proyecto">Nuestro Proyecto</a></li>
+                    <li><a href="index.html#criterios">Postúlate</a></li>
+                    <li><a href="index.html#comunidad" class="active">Comunidad</a></li>
+                    <li><a href="index.html#vitrina">Vitrina</a></li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fa-solid fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-header section-padding bg-light" style="padding-bottom: 20px;">
+        <div class="container text-center">
+            <h1 class="section-title" style="margin-bottom: 10px;">Comunidad Emprendedora</h1>
+            <p class="lead-text">Descubre el talento joven de Norte de Santander</p>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <section id="filters-section" class="section-padding" style="padding-top: 20px; padding-bottom: 20px;">
+        <div class="container">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="filter-municipio"><i class="fa-solid fa-location-dot"></i> Municipio</label>
+                    <select id="filter-municipio">
+                        <option value="Todos">Todos los municipios</option>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-sector"><i class="fa-solid fa-tags"></i> Tipo de Emprendimiento</label>
+                    <select id="filter-sector">
+                        <option value="Todos">Todos los sectores</option>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Full Grid Section -->
+    <section id="comunidad-full" class="section-padding">
+        <div class="container">
+
+            <div id="comunidad-full-grid" class="cards-grid">
+                <!-- Javascript will inject content here -->
+                <div class="loader">Cargando comunidad...</div>
+            </div>
+
+            <div id="no-results-message" class="text-center" style="display: none; padding: 40px;">
+                <i class="fa-regular fa-folder-open" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                <p style="color: #666; font-size: 1.1rem;">No hay emprendimientos que coincidan con los filtros
+                    seleccionados.</p>
+                <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 15px;">Ver todos</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container footer-content">
+            <div class="footer-info">
+                <h4>Gobernación de Norte de Santander</h4>
+                <p>Secretaría de Desarrollo Económico y Productividad</p>
+                <p>Email: <a href="mailto:nextgenemprendends@gmail.com ">nextgenemprendends@gmail.com</a>
+                </p>
+            </div>
+            <div class="footer-offices">
+                <h4>Oficinas</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 5px; color: #ddd;"><strong>Cúcuta:</strong> Centro Comercial Lecs, L-120
+                    </li>
+                    <li style="color: #ddd;"><strong>Ocaña:</strong> Centro Comercial Cañaveral, segundo piso oficina
+                        221</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Institutional Logos -->
+        <div class="footer-logos">
+            <img src="img/LOGO SDEYP..png" alt="SDEYP" class="footer-logo-large">
+            <img src="img/LOGO NEXT GEN .png" alt="Next Gen" class="footer-logo-large">
+            <img src="img/Consorcio NJ.png" alt="Consorcio NJ">
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 NextGen Emprende NDS. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/573148804190" class="whatsapp-btn" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

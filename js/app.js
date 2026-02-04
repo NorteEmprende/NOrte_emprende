@@ -14,9 +14,12 @@ async function initApp() {
     const counterEl = document.getElementById('postulaciones-count');
     if (counterEl) updateCounter();
 
-    // 4. Load Dynamic Content (CSV) - Comunidad
+    // 4. Load Dynamic Content
     const communityGrid = document.getElementById('emprendimientos-grid');
     if (communityGrid) loadComunidadFromCSV();
+
+    const fullCommunityGrid = document.getElementById('comunidad-full-grid');
+    if (fullCommunityGrid) loadComunidadPage();
 
     // 5. Setup Modal Close Listeners
     setupModalListeners();
@@ -28,6 +31,10 @@ async function initApp() {
     // 7. Load Vitrina (Main Page Version)
     const vitrinaGrid = document.getElementById('vitrina-grid');
     if (vitrinaGrid) loadVitrina();
+
+    // 8. Load Rutas NextGen
+    const rutasContainer = document.getElementById('rutas-container');
+    if (rutasContainer) renderRutasNextGen();
 }
 
 /* =========================================
@@ -236,102 +243,171 @@ function extractDriveId(url) {
 
 /* --- Comunidad Emprendedora (Debugging & Refinement) --- */
 
-async function loadComunidadFromCSV() {
-    // FIXED LINK - DO NOT CHANGE ESTRUCTURA
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0Zd-9e02hdTaUymNBaLKzphvDrcahiaUs7gmHe9Lup1_FURxAnXV6aLdH3PciBGy_2upZocBtFOtz/pub?gid=0&single=true&output=csv';
-    const container = document.getElementById('emprendimientos-grid');
+/* --- Comunidad Emprendedora (Refactored) --- */
 
-    if (!container) return;
+let globalComunidadData = []; // Store data for filtering
 
-    console.log(">>> [Comunidad] Iniciando carga de datos...");
+async function fetchComunidadData() {
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR1m8c_M-L39OfXRC4qqGkMuT2liOaogntkZntOeHOiQ7hXTrUFKJrIjOG4amjpCJ7LmTPKzF5GcD9/pub?gid=1269159520&single=true&output=csv';
 
     try {
-        // Cache-busting to always get fresh data
         const response = await fetch(csvUrl + "&_=" + Date.now());
         const text = await response.text();
-
-        // 1. RAW PARSE
         const allRows = parseRobustCSV(text);
-        console.log(`>>> [Comunidad] Filas detectadas en total (incluyendo header): ${allRows.length}`);
+        const dataRows = allRows.slice(1);
 
-        if (allRows.length > 0) {
-            console.log(">>> [Comunidad] Header detectado:", allRows[0]);
-        }
-
-        const dataRows = allRows.slice(1); // Skip header
-        container.innerHTML = '';
-
-        let discardedCount = 0;
         let validEntries = [];
+        dataRows.forEach((cols) => {
+            // Relaxed validation: Just check if we have enough columns for the mandatory fields (up to index 9)
+            // If the row is shorter, we can pad it or just check undefined.
 
-        // 2. ROBUST FILTER & MAPPING (RELAXED VALIDATION)
-        // Indices A->O (0-14)
-        dataRows.forEach((cols, index) => {
-            // Filter empty lines
-            if (cols.length === 0 || (cols.length === 1 && cols[0] === '')) return;
+            // Mandatory: Name (1), Business (5), Muni (9)
+            const nombre = cols[1]?.trim();
+            const negocio = cols[5]?.trim();
+            const muni = cols[9]?.trim();
 
-            // Technical Validation: Must have at least 10 columns (0 to 9)
-            // Indices 10 to 14 are optional (trailing empty cells or redes sociales)
-            if (cols.length < 10) {
-                console.warn(`[Fila ${index + 2}] Descartada: Columnas insuficientes (${cols.length}/10)`);
-                discardedCount++;
-                return;
-            }
-
-            // UX Validation: Check mandatory fields
-            // Index 1: Entrepreneur Name, Index 5: Business Name, Index 9: Municipality
-            if (!cols[1] || cols[1].trim() === '' || !cols[5] || cols[5].trim() === '' || !cols[9] || cols[9].trim() === '') {
-                console.warn(`[Fila ${index + 2}] Descartada: Faltan campos obligatorios (nombre/negocio/muni)`);
-                discardedCount++;
-                return;
-            }
+            if (!nombre || !negocio || !muni) return;
 
             const data = {
-                // Entrepreneur Info (Cols 1-4)
-                emprendedorNombre: cols[1].trim(),
+                emprendedorNombre: nombre,
                 emprendedorBio: cols[2] || '',
                 emprendedorVideo: cols[3] || '',
                 emprendedorFoto: convertDriveLink(cols[4]),
-
-                // Business Info (Cols 5-9)
-                negocioNombre: cols[5].trim(),
+                negocioNombre: negocio,
                 negocioDesc: cols[6] || '',
-                negocioTipo: cols[7] || '',
+                negocioTipo: cols[7] || 'Otro', // Default
                 negocioDireccion: cols[8] || '',
-                municipio: normalizeText(cols[9]),
-
-                // Optional Info (Cols 10-11)
-                negocioImg: cols[10] ? convertDriveLink(cols[10]) : '', // Protagonist for Card
+                municipio: normalizeText(muni),
+                negocioImg: cols[10] ? convertDriveLink(cols[10]) : '',
                 negocioVideo: cols[11] || '',
-
-                // Social Links (Cols 12-14)
                 tiktok: cols[12] || '',
                 instagram: cols[13] || '',
                 facebook: cols[14] || ''
             };
-
             validEntries.push(data);
         });
-
-        console.log(`>>> [Comunidad] Carga completada. Válidos: ${validEntries.length} | Descartados: ${discardedCount}`);
-        if (validEntries.length > 0) {
-            console.log(">>> [Comunidad] Ejemplo de las primeras filas parseadas:", validEntries.slice(0, 2));
-        }
-
-        if (validEntries.length === 0) {
-            container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No hay emprendedores disponibles con información completa en este momento.</p>';
-            return;
-        }
-
-        // 3. RENDER
-        validEntries.forEach(data => {
-            container.appendChild(createCommunityCard(data));
-        });
+        return validEntries;
 
     } catch (err) {
-        console.error('>>> [Comunidad] Error Fatal:', err);
-        container.innerHTML = '<p class="text-center error" style="grid-column: 1/-1;">Error crítico cargando la comunidad. Verifique la consola.</p>';
+        console.error('Error fetching data:', err);
+        return [];
     }
+}
+
+// 1. Home Logic (Preview)
+async function loadComunidadFromCSV() {
+    // This function now just handles the Home Page preview
+    const container = document.getElementById('emprendimientos-grid');
+    if (!container) return; // Not on home page or wrong section
+
+    const data = await fetchComunidadData();
+
+    if (data.length === 0) {
+        container.innerHTML = '<p class="text-center">No hay emprendimientos disponibles.</p>';
+        return;
+    }
+
+    // Logic: Show max 3 items, in order (no shuffle)
+    const previewData = data.slice(0, 3);
+
+    container.innerHTML = '';
+    previewData.forEach(item => {
+        container.appendChild(createCommunityCard(item));
+    });
+
+    // Ensure the "Ver Todos" button exists
+    // (It might be added manually in HTML, but this ensures robustness)
+    // We expect it to be hardcoded in HTML as per plan, so no action needed here.
+}
+
+// 2. Full Page Logic (Comunidad Page)
+async function loadComunidadPage() {
+    const container = document.getElementById('comunidad-full-grid');
+    if (!container) return;
+
+    const data = await fetchComunidadData();
+    globalComunidadData = data; // Save for filters
+
+    // Populate Filters
+    populateFilters(data);
+
+    // Initial Render (All)
+    renderComunidadGrid(data);
+
+    // Setup Listeners
+    setupFilterListeners();
+}
+
+function renderComunidadGrid(dataList) {
+    const container = document.getElementById('comunidad-full-grid');
+    const noResults = document.getElementById('no-results-message');
+
+    container.innerHTML = '';
+
+    if (dataList.length === 0) {
+        container.style.display = 'none';
+        if (noResults) noResults.style.display = 'block';
+        return;
+    }
+
+    container.style.display = 'grid';
+    if (noResults) noResults.style.display = 'none';
+
+    dataList.forEach(item => {
+        container.appendChild(createCommunityCard(item));
+    });
+}
+
+function populateFilters(data) {
+    const muniSelect = document.getElementById('filter-municipio');
+    const sectorSelect = document.getElementById('filter-sector');
+
+    if (!muniSelect || !sectorSelect) return;
+
+    // Get unique Municipios
+    const municipios = [...new Set(data.map(item => item.municipio))].sort();
+    municipios.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        muniSelect.appendChild(opt);
+    });
+
+    // Get unique Sectors
+    const sectors = [...new Set(data.map(item => item.negocioTipo))].sort();
+    sectors.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sectorSelect.appendChild(opt);
+    });
+}
+
+function setupFilterListeners() {
+    const muniSelect = document.getElementById('filter-municipio');
+    const sectorSelect = document.getElementById('filter-sector');
+
+    const filterFn = () => {
+        const mVal = muniSelect.value;
+        const sVal = sectorSelect.value;
+
+        const filtered = globalComunidadData.filter(item => {
+            const matchMuni = (mVal === 'Todos') || (item.municipio === mVal);
+            const matchSector = (sVal === 'Todos') || (item.negocioTipo === sVal);
+            return matchMuni && matchSector;
+        });
+
+        renderComunidadGrid(filtered);
+    };
+
+    muniSelect.addEventListener('change', filterFn);
+    sectorSelect.addEventListener('change', filterFn);
+}
+
+function resetFilters() {
+    document.getElementById('filter-municipio').value = 'Todos';
+    document.getElementById('filter-sector').value = 'Todos';
+    renderComunidadGrid(globalComunidadData);
 }
 
 function createCommunityCard(data) {
@@ -517,7 +593,7 @@ window.switchCommunityView = function (viewName) {
 /* --- Vitrina NextGen --- */
 
 async function loadVitrina() {
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSoXg_RmaJauLIOX_6OyFrncfQZhbPBOXqT4eiaQeThlN4H2Sjx4OgNZbykUC0VyIRiguVL4FMFcXo_/pub?gid=0&single=true&output=csv';
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5wG7maDoWY1HJrLAF9bJBFKs8B1loTiOn1SYuzS9_gr50-JwMAoArtKAP8wLIBYSVqHT_FIbNlyaC/pub?gid=372344697&single=true&output=csv';
     const container = document.getElementById('vitrina-grid');
 
     if (!container) return;
@@ -557,8 +633,8 @@ async function loadVitrina() {
             return;
         }
 
-        // 3. DETERMINISTIC SELECTION (First 5 valid items)
-        const selected = validNoticias.slice(0, Math.min(5, validNoticias.length));
+        // 3. DETERMINISTIC SELECTION (First 3 valid items)
+        const selected = validNoticias.slice(0, Math.min(3, validNoticias.length));
 
         // 4. RENDER
         selected.forEach(data => {
@@ -740,4 +816,77 @@ window.switchCommunityView = function (viewName) {
         tabs[1].classList.add('active');
         document.getElementById('view-business').classList.add('active');
     }
+}
+
+/* =========================================
+   Rutas NextGen
+   ========================================= */
+const rutasData = {
+    ruta1: [
+        { fecha: 'Viernes 6 de febrero', municipio: 'Teorama' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'San Calixto' },
+        { fecha: 'Sabado 7 de febrero', municipio: 'Cáchira' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'El Carmen' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'Convención' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Abrego' },
+        { fecha: 'Martes 10 de febrero', municipio: 'La Playa' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Ocaña' }
+    ],
+    ruta2: [
+        { fecha: 'Viernes 6 de febrero', municipio: 'Puerto Santander' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'Tibú' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Los Patios' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Cúcuta' },
+    ],
+    ruta3: [
+        { fecha: 'Lunes 9 de febrero', municipio: 'Sardinata' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'El Zulia' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Salazar' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Arboledas' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Bochalema' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Pamplona' },
+        { fecha: 'Jueves 12 de febrero', municipio: 'Chitagá' },
+        { fecha: 'Jueves 12 de febrero', municipio: 'Toledo' }
+    ]
+};
+
+function renderRutasNextGen() {
+    const container = document.getElementById('rutas-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    Object.keys(rutasData).forEach((key, index) => {
+        const rutaName = ``;
+        const items = rutasData[key];
+        const card = document.createElement('div');
+        card.className = 'ruta-card';
+
+        let listHtml = '';
+        if (items.length > 0) {
+            listHtml = `<ul class="ruta-list">
+                ${items.map(item => `
+                    <li>
+                        <span class="r-date"><i class="fa-regular fa-calendar"></i> ${item.fecha}</span>
+                        <span class="r-muni"><i class="fa-solid fa-location-dot"></i> ${item.municipio}</span>
+                    </li>
+                `).join('')}
+            </ul>`;
+        } else {
+            listHtml = `<div class="ruta-empty">
+                <i class="fa-solid fa-road"></i>
+                <p>Próximamente disponible</p>
+            </div>`;
+        }
+
+        card.innerHTML = `
+            <div class="ruta-header">
+                <h3>${rutaName}</h3>
+            </div>
+            <div class="ruta-body">
+                ${listHtml}
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
