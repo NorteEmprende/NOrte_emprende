@@ -831,31 +831,31 @@ window.switchCommunityView = function (viewName) {
    ========================================= */
 const rutasData = {
     ruta1: [
-        { fecha: 'Viernes 6 de febrero', municipio: 'Teorama' },
-        { fecha: 'Viernes 6 de febrero', municipio: 'San Calixto' },
-        { fecha: 'Sabado 7 de febrero', municipio: 'Cáchira' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'El Carmen' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'Convención' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Abrego' },
-        { fecha: 'Martes 10 de febrero', municipio: 'La Playa' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Ocaña' }
+        { fecha: 'Viernes 6 de febrero', municipio: 'Teorama', hora: '9:00 a.m.', lugar: 'Casa Cural' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'San Calixto', hora: '2:00 p.m.', lugar: 'Casa de la Cultura' },
+        { fecha: 'Sabado 7 de febrero', municipio: 'Cáchira', hora: '9:00 a.m.', lugar: 'Hogar Infantil San Pedro Claver, Barrio San Agustín' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'El Carmen', hora: '9:00 a.m.', lugar: 'Casa del Bingo' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'Convención', hora: '2:00 p.m.', lugar: 'Centro de Convivencia Ciudadana' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Abrego', hora: '9:00 a.m.', lugar: '' },
+        { fecha: 'Martes 10 de febrero', municipio: 'La Playa', hora: '2:00 p.m.', lugar: '' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Ocaña', hora: '2:00 p.m.', lugar: '' }
     ],
     ruta2: [
-        { fecha: 'Viernes 6 de febrero', municipio: 'Puerto Santander' },
-        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'Tibú' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Los Patios' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Cúcuta' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'Puerto Santander', hora: '', lugar: '' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario', hora: '', lugar: '' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'Tibú', hora: '', lugar: '' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Los Patios', hora: '', lugar: '' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Cúcuta', hora: '', lugar: '' },
     ],
     ruta3: [
-        { fecha: 'Lunes 9 de febrero', municipio: 'Sardinata' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'El Zulia' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Salazar' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Arboledas' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Bochalema' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Pamplona' },
-        { fecha: 'Jueves 12 de febrero', municipio: 'Chitagá' },
-        { fecha: 'Jueves 12 de febrero', municipio: 'Toledo' }
+        { fecha: 'Lunes 9 de febrero', municipio: 'Sardinata', hora: '', lugar: '' },
+        { fecha: 'Lunes 9 de febrero', municipio: 'El Zulia', hora: '', lugar: '' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Salazar', hora: '', lugar: '' },
+        { fecha: 'Martes 10 de febrero', municipio: 'Arboledas', hora: '', lugar: '' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Bochalema', hora: '', lugar: '' },
+        { fecha: 'Miercoles 11 de febrero', municipio: 'Pamplona', hora: '', lugar: '' },
+        { fecha: 'Jueves 12 de febrero', municipio: 'Chitagá', hora: '', lugar: '' },
+        { fecha: 'Jueves 12 de febrero', municipio: 'Toledo', hora: '', lugar: '' }
     ]
 };
 
@@ -875,8 +875,12 @@ function renderRutasNextGen() {
             listHtml = `<ul class="ruta-list">
                 ${items.map(item => `
                     <li>
-                        <span class="r-date"><i class="fa-regular fa-calendar"></i> ${item.fecha}</span>
-                        <span class="r-muni"><i class="fa-solid fa-location-dot"></i> ${item.municipio}</span>
+                        <div class="ruta-item-content">
+                            <span class="r-date"><i class="fa-regular fa-calendar"></i> ${item.fecha}</span>
+                            <span class="r-muni"><i class="fa-solid fa-location-dot"></i> ${item.municipio}</span>
+                            ${item.hora ? `<span class="r-time"><i class="fa-regular fa-clock"></i> ${item.hora}</span>` : ''}
+                            ${item.lugar ? `<span class="r-place"><i class="fa-solid fa-map-pin"></i> ${item.lugar}</span>` : ''}
+                        </div>
                     </li>
                 `).join('')}
             </ul>`;
