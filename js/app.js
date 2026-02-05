@@ -842,7 +842,7 @@ const rutasData = {
     ],
     ruta2: [
         { fecha: 'Viernes 6 de febrero', municipio: 'Puerto Santander', hora: '', lugar: '' },
-        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario', hora: '', lugar: '' },
+        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario', hora: '2:00 p.m', lugar: 'Auditorio Alcaldia Municipal de Villa del Rosario' },
         { fecha: 'Lunes 9 de febrero', municipio: 'Tibú', hora: '', lugar: '' },
         { fecha: 'Martes 10 de febrero', municipio: 'Los Patios', hora: '', lugar: '' },
         { fecha: 'Martes 10 de febrero', municipio: 'Cúcuta', hora: '', lugar: '' },
