@@ -830,32 +830,38 @@ window.switchCommunityView = function (viewName) {
    Rutas NextGen
    ========================================= */
 const rutasData = {
-    ruta1: [
-        { fecha: 'Viernes 6 de febrero', municipio: 'Teorama', hora: '9:00 a.m.', lugar: 'Casa Cural' },
-        { fecha: 'Viernes 6 de febrero', municipio: 'San Calixto', hora: '2:00 p.m.', lugar: 'Casa de la Cultura' },
-        { fecha: 'Sabado 7 de febrero', municipio: 'Cáchira', hora: '9:00 a.m.', lugar: 'Hogar Infantil San Pedro Claver, Barrio San Agustín' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'El Carmen', hora: '9:00 a.m.', lugar: 'Casa del Bingo' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'Convención', hora: '2:00 p.m.', lugar: 'Centro de Convivencia Ciudadana' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Abrego', hora: '9:00 a.m.', lugar: '' },
-        { fecha: 'Martes 10 de febrero', municipio: 'La Playa', hora: '2:00 p.m.', lugar: '' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Ocaña', hora: '2:00 p.m.', lugar: '' }
+    'Viernes 6 de febrero': [
+        { municipio: 'Teorama', hora: '9:00 a.m.', lugar: 'Casa Cural' },
+        { municipio: 'Puerto Santander', hora: '', lugar: '' },
+        { municipio: 'San Calixto', hora: '2:00 p.m.', lugar: 'Casa de la Cultura' },
+        { municipio: 'Villa del Rosario', hora: '2:00 p.m.', lugar: 'Auditorio Alcaldia Municipal de Villa del Rosario' }
     ],
-    ruta2: [
-        { fecha: 'Viernes 6 de febrero', municipio: 'Puerto Santander', hora: '', lugar: '' },
-        { fecha: 'Viernes 6 de febrero', municipio: 'Villa del Rosario', hora: '2:00 p.m', lugar: 'Auditorio Alcaldia Municipal de Villa del Rosario' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'Tibú', hora: '', lugar: '' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Los Patios', hora: '', lugar: '' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Cúcuta', hora: '', lugar: '' },
+
+    'Lunes 9 de febrero': [
+        { municipio: 'El Carmen', hora: '9:00 a.m.', lugar: 'Casa del Bingo' },
+        { municipio: 'El Zulia', hora: '2:00 p.m.', lugar: 'Casa de la Mujer Emprendedora' },
+        { municipio: 'Convención', hora: '2:00 p.m.', lugar: 'Centro de Convivencia Ciudadana' },
+        { municipio: 'Sardinata', hora: '4:00 p.m.', lugar: 'Oficina de Juventud' },
+        { municipio: 'Tibú', hora: '', lugar: 'Seminario San Luis Beltrán - Salón de Eventos San José' }
     ],
-    ruta3: [
-        { fecha: 'Lunes 9 de febrero', municipio: 'Sardinata', hora: '', lugar: '' },
-        { fecha: 'Lunes 9 de febrero', municipio: 'El Zulia', hora: '', lugar: '' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Salazar', hora: '', lugar: '' },
-        { fecha: 'Martes 10 de febrero', municipio: 'Arboledas', hora: '', lugar: '' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Bochalema', hora: '', lugar: '' },
-        { fecha: 'Miercoles 11 de febrero', municipio: 'Pamplona', hora: '', lugar: '' },
-        { fecha: 'Jueves 12 de febrero', municipio: 'Chitagá', hora: '', lugar: '' },
-        { fecha: 'Jueves 12 de febrero', municipio: 'Toledo', hora: '', lugar: '' }
+    'Martes 10 de febrero': [
+        { municipio: 'Salazar', hora: '9:00 a.m.', lugar: 'Salon de Eventos Juana Naranja' },
+        { municipio: 'La Playa', hora: '9:00 a.m.', lugar: 'Auditorio IE Colegio Fray José Maria Arévalo' },
+        { municipio: 'Ábrego', hora: '2:00 p.m.', lugar: 'Salon de Eventos Los Alpes' },
+        { municipio: 'Los Patios', hora: '2:00 p.m.', lugar: '' },
+        { municipio: 'Arboledas', hora: '2:00 p.m.', lugar: '' }
+    ],
+    'Miércoles 11 de febrero': [
+        { municipio: 'Pamplona', hora: '9:00 a.m.', lugar: '' },
+        { municipio: 'Ocaña', hora: '9:00 a.m.', lugar: 'Auditorio Colegio Argelino Durán El Bambo' },
+        { municipio: 'Bochalema', hora: '2:00 p.m.', lugar: '' },
+        { municipio: 'Puerto Santander', hora: '', lugar: '' }
+    ],
+    'Jueves 12 de febrero': [
+        { municipio: 'Cúcuta', hora: '10:00 a.m.', lugar: 'Auditorio Edificio Administrativo - Pescadero' },
+        { municipio: 'Chitagá', hora: '', lugar: '' },
+        { municipio: 'Toledo', hora: '', lugar: '' },
+        { municipio: 'Cáchira', hora: '', lugar: '' }
     ]
 };
 
@@ -864,9 +870,8 @@ function renderRutasNextGen() {
     if (!container) return;
     container.innerHTML = '';
 
-    Object.keys(rutasData).forEach((key, index) => {
-        const rutaName = ``;
-        const items = rutasData[key];
+    Object.keys(rutasData).forEach((dateKey) => {
+        const items = rutasData[dateKey];
         const card = document.createElement('div');
         card.className = 'ruta-card';
 
@@ -876,7 +881,6 @@ function renderRutasNextGen() {
                 ${items.map(item => `
                     <li>
                         <div class="ruta-item-content">
-                            <span class="r-date"><i class="fa-regular fa-calendar"></i> ${item.fecha}</span>
                             <span class="r-muni"><i class="fa-solid fa-location-dot"></i> ${item.municipio}</span>
                             ${item.hora ? `<span class="r-time"><i class="fa-regular fa-clock"></i> ${item.hora}</span>` : ''}
                             ${item.lugar ? `<span class="r-place"><i class="fa-solid fa-map-pin"></i> ${item.lugar}</span>` : ''}
@@ -893,7 +897,7 @@ function renderRutasNextGen() {
 
         card.innerHTML = `
             <div class="ruta-header">
-                <h3>${rutaName}</h3>
+                <h3>${dateKey}</h3>
             </div>
             <div class="ruta-body">
                 ${listHtml}
