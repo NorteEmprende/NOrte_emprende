@@ -852,7 +852,7 @@ const rutasData = {
         { municipio: 'Arboledas', hora: '2:00 p.m.', lugar: '' }
     ],
     'Miércoles 11 de febrero': [
-        { municipio: 'Pamplona', hora: '9:00 a.m.', lugar: '' },
+        { municipio: 'Pamplona', hora: '8:00 a.m.', lugar: 'Centro Día (Antigua plaza de toros)' },
         { municipio: 'Ocaña', hora: '9:00 a.m.', lugar: 'Auditorio Colegio Argelino Durán El Bambo' },
         { municipio: 'Bochalema', hora: '2:00 p.m.', lugar: '' },
         { municipio: 'Puerto Santander', hora: '', lugar: '' }
