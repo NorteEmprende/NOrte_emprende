@@ -848,8 +848,8 @@ const rutasData = {
         { municipio: 'Salazar', hora: '9:00 a.m.', lugar: 'Salon de Eventos Juana Naranja' },
         { municipio: 'La Playa', hora: '9:00 a.m.', lugar: 'Auditorio IE Colegio Fray José Maria Arévalo' },
         { municipio: 'Ábrego', hora: '2:00 p.m.', lugar: 'Salon de Eventos Los Alpes' },
-        { municipio: 'Los Patios', hora: '2:00 p.m.', lugar: '' },
-        { municipio: 'Arboledas', hora: '2:00 p.m.', lugar: '' }
+        { municipio: 'Los Patios', hora: '2:00 p.m.', lugar: 'Salón de Eventos Belén Av. 10 No. 17a -39' },
+        { municipio: 'Arboledas', hora: '2:00 p.m.', lugar: 'Teatro Municipal de Arboledas' }
     ],
     'Miércoles 11 de febrero': [
         { municipio: 'Pamplona', hora: '8:00 a.m.', lugar: 'Centro Día (Antigua plaza de toros)' },
