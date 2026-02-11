@@ -854,14 +854,14 @@ const rutasData = {
     'Miércoles 11 de febrero': [
         { municipio: 'Pamplona', hora: '8:00 a.m.', lugar: 'Centro Día (Antigua plaza de toros)' },
         { municipio: 'Ocaña', hora: '9:00 a.m.', lugar: 'Auditorio Colegio Argelino Durán El Bambo' },
-        { municipio: 'Bochalema', hora: '2:00 p.m.', lugar: '' },
-        { municipio: 'Puerto Santander', hora: '', lugar: '' }
+        { municipio: 'Toledo', hora: '9+:00 a.m.', lugar: 'Centro Dia (Antigua Plaza de Toros)' },
+        { municipio: 'Puerto Santander', hora: '2:00 p.m', lugar: 'Calle 7 , carrera 4a, #4-69, Barrio el Carmen' }
     ],
     'Jueves 12 de febrero': [
         { municipio: 'Cúcuta', hora: '10:00 a.m.', lugar: 'Auditorio Edificio Administrativo - Pescadero' },
-        { municipio: 'Chitagá', hora: '', lugar: '' },
-        { municipio: 'Toledo', hora: '', lugar: '' },
-        { municipio: 'Cáchira', hora: '', lugar: '' }
+        { municipio: 'Chitagá', hora: '8:00 a.m', lugar: 'Carrera 7, barrio Centro, a media cuadra del parque principal de Chitagá, Restarante Lismao' },
+        { municipio: 'Bochalema', hora: '1:00 p.m', lugar: 'Carrera 2 # 2-20, Barrio San Bartolomeo' },
+        { municipio: 'Cáchira', hora: '10:30 a.m', lugar: 'Hogar Infantil San Pedro claver, Barrio San Auguistin' }
     ]
 };
 
