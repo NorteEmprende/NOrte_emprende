@@ -245,6 +245,12 @@ function extractDriveId(url) {
     return match ? match[1] : null;
 }
 
+function extractYouTubeId(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|watch\?v=)([^&?]+)/);
+    return match ? match[1] : null;
+}
+
 /* --- Comunidad Emprendedora (Debugging & Refinement) --- */
 
 /* --- Comunidad Emprendedora (Refactored) --- */
@@ -457,6 +463,11 @@ function openCommunityModal(data) {
 
     const eDriveId = extractDriveId(data.emprendedorVideo);
     const nDriveId = extractDriveId(data.negocioVideo);
+
+    // Extract YouTube IDs
+    const eYouTubeId = extractYouTubeId(data.emprendedorVideo);
+    const nYouTubeId = extractYouTubeId(data.negocioVideo);
+
     const eFoto = data.emprendedorFoto || 'img/LOGO NEXT GEN .png';
 
     // Socials Logic
@@ -501,17 +512,15 @@ function openCommunityModal(data) {
                     <h5 class="modal-section-title">Trayectoria Profesional</h5>
                     <p class="modal-text-content">${safeEBio}</p>
 
-                    ${eDriveId ? `
+                    ${eYouTubeId ? `
+                        <h5 class="modal-section-title">Video de Presentación</h5>
+                        <div class="modal-video-container">
+                            <iframe src="https://www.youtube.com/embed/${eYouTubeId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    ` : eDriveId ? `
                         <h5 class="modal-section-title">Video de Presentación</h5>
                         <div class="modal-video-container">
                             <iframe src="https://drive.google.com/file/d/${eDriveId}/preview" allowfullscreen></iframe>
-                        </div>
-                    ` : data.emprendedorVideo ? `
-                        <h5 class="modal-section-title">Video de Presentación</h5>
-                        <div class="text-center mt-3">
-                            <a href="${data.emprendedorVideo}" target="_blank" class="btn btn-secondary">
-                                <i class="fa-solid fa-play"></i> Ver video externo
-                            </a>
                         </div>
                     ` : ''}
                 </div>
@@ -528,16 +537,15 @@ function openCommunityModal(data) {
                             <h5 class="modal-section-title">Propuesta de Valor</h5>
                             <p class="modal-text-content">${safeNDesc}</p>
                             
-                            ${nDriveId ? `
+                            ${nYouTubeId ? `
+                                <h5 class="modal-section-title">Galería y Actividades</h5>
+                                <div class="modal-video-container">
+                                    <iframe src="https://www.youtube.com/embed/${nYouTubeId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            ` : nDriveId ? `
                                 <h5 class="modal-section-title">Galería y Actividades</h5>
                                 <div class="modal-video-container">
                                     <iframe src="https://drive.google.com/file/d/${nDriveId}/preview" allowfullscreen></iframe>
-                                </div>
-                            ` : data.negocioVideo ? `
-                                <div class="text-center mt-3">
-                                    <a href="${data.negocioVideo}" target="_blank" class="btn btn-secondary">
-                                        <i class="fa-solid fa-play"></i> Ver video del negocio
-                                    </a>
                                 </div>
                             ` : ''}
                         </div>
