@@ -1072,14 +1072,13 @@ function setupConsultaResultados() {
                 if (requisitosMinimos === 'CUMPLE') {
                     Swal.fire({
                         icon: 'success',
-                        title: '🎉 ¡Felicidades!',
+                        title: '🎉 ¡Felicitaciones!',
                         html: `
                             <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
-                                <p>Felicidades.<br>
-                                Tu emprendimiento ha sido habilitado para continuar en el programa NEXTGEN EMPRENDE NDS, al cumplir con la validación de los requisitos mínimos establecidos en la convocatoria.</p>
-                                <p>Nuestro comité de evaluación identificó en tu iniciativa un alto potencial de crecimiento, innovación y compromiso con el desarrollo económico de Norte de Santander.</p>
-                                <p>Has sido habilitado para continuar en la fase de preselección del programa, donde los emprendimientos avanzarán en el proceso de fortalecimiento empresarial.</p>
-                                <p>En los próximos días recibirás información con los detalles de las siguientes etapas del programa.</p>
+                                <p>Nos complace informarte que tu emprendimiento ha superado la validación de requisitos mínimos para el programa NEXTGEN EMPRENDE NDS.</p>
+                                <p>Tras la revisión de los documentos y la información adjunta en tu postulación, se verificó que cumples con los criterios establecidos para continuar en el proceso de selección.</p>
+                                <p>Este resultado te permite avanzar a las siguientes etapas del programa, donde el comité de evaluación continuará analizando las iniciativas postuladas para definir los emprendimientos que harán parte del proceso de fortalecimiento empresarial.</p>
+                                <p>Agradecemos tu interés en participar y tu compromiso con el emprendimiento y el desarrollo económico de Norte de Santander.</p>
                                 <p>Gracias por creer en el emprendimiento y por ser parte de la nueva generación que transforma nuestro territorio.</p>
                             </div>
                         `,
