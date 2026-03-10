@@ -41,6 +41,9 @@ async function initApp() {
 
     // 10. Postulation Modal
     setupPostulacionModal();
+
+    // 11. Consulta Resultados
+    setupConsultaResultados();
 }
 
 /* =========================================
@@ -997,5 +1000,163 @@ function setupPostulacionModal() {
         `;
 
         openModal(contentHtml);
+    });
+}
+
+/* =========================================
+   Consulta de Resultados Logic
+   ========================================= */
+function setupConsultaResultados() {
+    const btn = document.getElementById('btn-consultar-resultado');
+    const input = document.getElementById('cedula-input');
+
+    if (!btn || !input) return;
+
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const cedula = input.value.trim();
+        if (!cedula) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Por favor, ingresa tu número de cédula.'
+            });
+            return;
+        }
+
+        // Disable button and show loading state
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Consultando...';
+        btn.disabled = true;
+
+        try {
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDza2h6HARc-jFfdjnAusdL2SS0LGlXkSb_eX2IkRfSK3kGBvwrkAuW3-MuOOYSQ/pub?gid=740909374&single=true&output=csv';
+
+            // Add timestamp to prevent caching
+            const response = await fetch(csvUrl + '&_=' + Date.now());
+            const text = await response.text();
+
+            // Re-using the same robust parser from the project
+            const rows = parseRobustCSV(text);
+
+            // Assuming first row is header, skip it if length > 1
+            const dataRows = rows.length > 1 ? rows.slice(1) : [];
+
+            let encontrado = false;
+            let filaEncontrada = null;
+
+            // Clean the input string by removing spaces
+            const cleanInputCedula = cedula.replace(/\s+/g, '');
+
+            // Search for the cedula
+            for (let i = 0; i < dataRows.length; i++) {
+                const cols = dataRows[i];
+                if (!cols || cols.length === 0) continue;
+
+                // Read only the 'CEDULA' column which is at index 0
+                const cedulaCSV = (cols[0] || '').toString();
+                const cleanCellCedula = cedulaCSV.replace(/\s+/g, '');
+
+                if (cleanCellCedula === cleanInputCedula) {
+                    encontrado = true;
+                    filaEncontrada = cols;
+                    break;
+                }
+            }
+
+            if (encontrado && filaEncontrada) {
+                const requisitosMinimos = (filaEncontrada[3] || '').toString().trim().toUpperCase();
+                const evaluacion = (filaEncontrada[4] || '').toString().trim();
+
+                if (requisitosMinimos === 'CUMPLE') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '🎉 ¡Felicidades!',
+                        html: `
+                            <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                                <p>Felicidades.<br>
+                                Tu emprendimiento ha sido <strong>seleccionado para formar parte del programa NEXTGEN EMPRENDE NDS</strong>.</p>
+                                <p>Nuestro comité de evaluación identificó en tu iniciativa un alto potencial de crecimiento, innovación y compromiso con el desarrollo económico de Norte de Santander.</p>
+                                <p>Has sido elegido como uno de los emprendimientos que participarán en el proceso de <strong>fortalecimiento empresarial</strong>, donde recibirás acompañamiento, formación y herramientas para impulsar tu proyecto.</p>
+                                <p>En los próximos días recibirás información con los detalles de las siguientes etapas del programa.</p>
+                                <p>Gracias por creer en el emprendimiento y por ser parte de la nueva generación que transforma nuestro territorio.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#3085d6',
+                        width: 600
+                    });
+                } else if (requisitosMinimos === 'NO CUMPLE') {
+                    if (evaluacion === '') {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Resultado de la convocatoria',
+                            html: `
+                                <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                                    <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
+                                    <p>Después del proceso de evaluación realizado por el comité técnico del programa, tu emprendimiento <strong>no fue seleccionado en esta etapa de la convocatoria</strong>.</p>
+                                    <p>En esta ocasión no se registró un comentario específico dentro del sistema de evaluación.</p>
+                                    <p>Te invitamos a continuar fortaleciendo tu iniciativa y a estar atento a futuras convocatorias y programas de apoyo al emprendimiento.</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Cerrar',
+                            confirmButtonColor: '#6c757d',
+                            width: 600
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Resultado de la convocatoria',
+                            html: `
+                                <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                                    <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
+                                    <p>Después del proceso de evaluación realizado por el comité técnico del programa, tu emprendimiento <strong>no fue seleccionado en esta etapa</strong>.</p>
+                                    <p>Observación del comité evaluador:</p>
+                                    <p><em>${escapeHtml(evaluacion)}</em></p>
+                                    <p>Te invitamos a continuar fortaleciendo tu iniciativa y a estar atento a futuras convocatorias y programas de apoyo al emprendimiento.</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Cerrar',
+                            confirmButtonColor: '#6c757d',
+                            width: 600
+                        });
+                    }
+                } else {
+                    // Fallback just in case standard text changes subtly or not matched
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Resultado no determinado',
+                        text: 'Se encontró tu número de documento, pero no hay un veredicto definitivo registrado. Por favor, comunícate con nosotros para más información.'
+                    });
+                }
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Registro no encontrado',
+                    html: `
+                        <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                            <p>No encontramos tu número de cédula dentro de la base de datos de resultados de la convocatoria.</p>
+                            <p>Verifica que el número ingresado sea correcto e inténtalo nuevamente.</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: '#6c757d',
+                    width: 600
+                });
+            }
+
+        } catch (error) {
+            console.error('Error al consultar resultados:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de conexión',
+                text: 'Hubo un problema al consultar los resultados. Por favor, inténtalo de nuevo más tarde.'
+            });
+        } finally {
+            // Restore button state
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     });
 }
