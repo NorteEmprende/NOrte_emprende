@@ -1076,9 +1076,9 @@ function setupConsultaResultados() {
                         html: `
                             <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
                                 <p>Felicidades.<br>
-                                Tu emprendimiento ha sido <strong>seleccionado para formar parte del programa NEXTGEN EMPRENDE NDS</strong>.</p>
+                                Tu emprendimiento ha sido habilitado para continuar en el programa NEXTGEN EMPRENDE NDS, al cumplir con la validación de los requisitos mínimos establecidos en la convocatoria.</p>
                                 <p>Nuestro comité de evaluación identificó en tu iniciativa un alto potencial de crecimiento, innovación y compromiso con el desarrollo económico de Norte de Santander.</p>
-                                <p>Has sido elegido como uno de los emprendimientos que participarán en el proceso de <strong>fortalecimiento empresarial</strong>, donde recibirás acompañamiento, formación y herramientas para impulsar tu proyecto.</p>
+                                <p>Has sido habilitado para continuar en la fase de preselección del programa, donde los emprendimientos avanzarán en el proceso de fortalecimiento empresarial.</p>
                                 <p>En los próximos días recibirás información con los detalles de las siguientes etapas del programa.</p>
                                 <p>Gracias por creer en el emprendimiento y por ser parte de la nueva generación que transforma nuestro territorio.</p>
                             </div>
