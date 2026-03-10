@@ -1074,7 +1074,7 @@ function setupConsultaResultados() {
                         icon: 'success',
                         title: '🎉 ¡Felicitaciones!',
                         html: `
-                            <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                            <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
                                 <p>Nos complace informarte que tu emprendimiento ha superado la validación de requisitos mínimos para el programa NEXTGEN EMPRENDE NDS.</p>
                                 <p>Tras la revisión de los documentos y la información adjunta en tu postulación, se verificó que cumples con los criterios establecidos para continuar en el proceso de selección.</p>
                                 <p>Este resultado te permite avanzar a las siguientes etapas del programa, donde el comité de evaluación continuará analizando las iniciativas postuladas para definir los emprendimientos que harán parte del proceso de fortalecimiento empresarial.</p>
@@ -1092,7 +1092,7 @@ function setupConsultaResultados() {
                             icon: 'info',
                             title: 'Resultado de la convocatoria',
                             html: `
-                                <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
                                     <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
                                     <p>Después del proceso de evaluación realizado por el comité técnico del programa, tu emprendimiento <strong>no fue seleccionado en esta etapa de la convocatoria</strong>.</p>
                                     <p>En esta ocasión no se registró un comentario específico dentro del sistema de evaluación.</p>
@@ -1134,7 +1134,7 @@ function setupConsultaResultados() {
                     icon: 'warning',
                     title: 'Registro no encontrado',
                     html: `
-                        <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                        <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
                             <p>No encontramos tu número de cédula dentro de la base de datos de resultados de la convocatoria.</p>
                             <p>Verifica que el número ingresado sea correcto e inténtalo nuevamente.</p>
                         </div>
