@@ -1108,7 +1108,7 @@ function setupConsultaResultados() {
                             icon: 'info',
                             title: 'Resultado de la convocatoria',
                             html: `
-                                <div style="text-align: left; font-size: 1.05rem; line-height: 1.6;">
+                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
                                     <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
                                     <p>Después del proceso de evaluación realizado por el comité técnico del programa, tu emprendimiento <strong>no fue seleccionado en esta etapa</strong>.</p>
                                     <p>Observación del comité evaluador:</p>
