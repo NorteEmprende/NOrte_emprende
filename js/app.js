@@ -1006,6 +1006,35 @@ function setupPostulacionModal() {
 /* =========================================
    Consulta de Resultados Logic
    ========================================= */
+
+async function consultarTerceraFase(cedula) {
+    const csvUrlFase3 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKQxlCAQ8_MamsnjZ0UtEtmyxZJEnZJWPQtzRqphHWj_xGj9xiqnmML6ZMhpkXopfVPCbYFCzCf9FE/pub?gid=0&single=true&output=csv';
+    try {
+        const response = await fetch(csvUrlFase3 + '&_=' + Date.now());
+        const text = await response.text();
+        const rows = parseRobustCSV(text);
+        const dataRows = rows.length > 1 ? rows.slice(1) : [];
+
+        const cleanInputCedula = cedula.replace(/\s+/g, '');
+
+        for (let i = 0; i < dataRows.length; i++) {
+            const cols = dataRows[i];
+            if (!cols || cols.length < 2) continue; // Al menos No. y cedula
+
+            // La cédula está en la columna "cedula" (índice 1 según "No., cedula, estado")
+            const cedulaCSV = (cols[1] || '').toString();
+            const cleanCellCedula = cedulaCSV.replace(/\s+/g, '');
+
+            if (cleanCellCedula === cleanInputCedula) {
+                return true;
+            }
+        }
+    } catch (error) {
+        console.error('Error al consultar tercera fase:', error);
+    }
+    return false;
+}
+
 function setupConsultaResultados() {
     const btn = document.getElementById('btn-consultar-resultado');
     const input = document.getElementById('cedula-input');
@@ -1070,22 +1099,43 @@ function setupConsultaResultados() {
                 const evaluacion = (filaEncontrada[4] || '').toString().trim();
 
                 if (requisitosMinimos === 'CUMPLE') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '🎉 ¡Felicitaciones!',
-                        html: `
-                            <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
-                                <p>Nos complace informarte que tu emprendimiento ha superado la validación de requisitos mínimos para el programa NEXTGEN EMPRENDE NDS.</p>
-                                <p>Tras la revisión de los documentos y la información adjunta en tu postulación, se verificó que cumples con los criterios establecidos para continuar en el proceso de selección.</p>
-                                <p>Este resultado te permite avanzar a las siguientes etapas del programa, donde el comité de evaluación continuará analizando las iniciativas postuladas para definir los emprendimientos que harán parte del proceso de fortalecimiento empresarial.</p>
-                                <p>Agradecemos tu interés en participar y tu compromiso con el emprendimiento y el desarrollo económico de Norte de Santander.</p>
-                                <p>Gracias por creer en el emprendimiento y por ser parte de la nueva generación que transforma nuestro territorio.</p>
-                            </div>
-                        `,
-                        confirmButtonText: 'Entendido',
-                        confirmButtonColor: '#3085d6',
-                        width: 600
-                    });
+
+                    const pasaTerceraFase = await consultarTerceraFase(cedula);
+
+                    if (pasaTerceraFase) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '🎉 ¡Felicitaciones! Continúas en el proceso',
+                            html: `
+                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
+                                    <p>Nos complace compartir contigo excelentes noticias:</p>
+                                    <p>Has superado exitosamente la fase de evaluación de tu emprendimiento. Nos alegra informarte que avanzas a la siguiente etapa: <strong>visita presencial</strong>.</p>
+                                    <p>Nuestro equipo se pondrá en contacto contigo para coordinar los detalles de esta visita, cuyo propósito es validar la información de tu emprendimiento en campo y evaluar su potencial de cara a la selección de los 305 beneficiarios finales.</p>
+                                    <p>Agradecemos tu compromiso y dedicación con el fortalecimiento del emprendimiento en nuestro territorio.</p>
+                                    <p>Te invitamos a consultar la <strong>adenda a los TDR</strong>, donde encontrarás las actualizaciones del cronograma y las fechas clave de esta nueva fase del proceso.</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#3085d6',
+                            width: 600
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Resultado de la convocatoria',
+                            html: `
+                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
+                                    <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
+                                    <p>Te felicitamos por haber cumplido con la etapa anterior de validación de requisitos mínimos.</p>
+                                    <p>Sin embargo, tras finalizar la validación pertinente por parte del comité técnico del programa, te informamos que en esta ocasión tu emprendimiento <strong>no continúa a la fase de visitas presenciales</strong>.</p>
+                                    <p>Te invitamos a seguir trabajando con esa misma dedicación y a estar atento a futuras convocatorias y programas de apoyo al emprendimiento.</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Cerrar',
+                            confirmButtonColor: '#6c757d',
+                            width: 600
+                        });
+                    }
                 } else if (requisitosMinimos === 'NO CUMPLE') {
                     if (evaluacion === '') {
                         Swal.fire({
