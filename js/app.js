@@ -1007,10 +1007,10 @@ function setupPostulacionModal() {
    Consulta de Resultados Logic
    ========================================= */
 
-async function consultarTerceraFase(cedula) {
-    const csvUrlFase3 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKQxlCAQ8_MamsnjZ0UtEtmyxZJEnZJWPQtzRqphHWj_xGj9xiqnmML6ZMhpkXopfVPCbYFCzCf9FE/pub?gid=0&single=true&output=csv';
+// Función auxiliar reutilizable para buscar la cédula en un CSV
+async function buscarCedulaEnCSV(csvUrl, cedula, cedulaIndex) {
     try {
-        const response = await fetch(csvUrlFase3 + '&_=' + Date.now());
+        const response = await fetch(csvUrl + '&_=' + Date.now());
         const text = await response.text();
         const rows = parseRobustCSV(text);
         const dataRows = rows.length > 1 ? rows.slice(1) : [];
@@ -1019,10 +1019,9 @@ async function consultarTerceraFase(cedula) {
 
         for (let i = 0; i < dataRows.length; i++) {
             const cols = dataRows[i];
-            if (!cols || cols.length < 2) continue; // Al menos No. y cedula
+            if (!cols || cols.length <= cedulaIndex) continue;
 
-            // La cédula está en la columna "cedula" (índice 1 según "No., cedula, estado")
-            const cedulaCSV = (cols[1] || '').toString();
+            const cedulaCSV = (cols[cedulaIndex] || '').toString();
             const cleanCellCedula = cedulaCSV.replace(/\s+/g, '');
 
             if (cleanCellCedula === cleanInputCedula) {
@@ -1030,9 +1029,21 @@ async function consultarTerceraFase(cedula) {
             }
         }
     } catch (error) {
-        console.error('Error al consultar tercera fase:', error);
+        console.error('Error al consultar CSV:', error);
     }
     return false;
+}
+
+// 1. PRIMERO consultar la nueva tabla de 305 beneficiarios finales
+async function consultarBeneficiariosFinales(cedula) {
+    const csvUrlBeneficiarios = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0qH-yBdPQFwbwJ2bHGWrCLk4S-OQJFakLCQcWn4szFyOiaxFNqvax-rEbnlnPpg/pub?gid=1774240487&single=true&output=csv';
+    return await buscarCedulaEnCSV(csvUrlBeneficiarios, cedula, 1);
+}
+
+// 3. SI NO ESTÁ EN BENEFICIARIOS FINALES: consultar la tabla de visitas presenciales
+async function consultarTerceraFase(cedula) {
+    const csvUrlFase3 = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKQxlCAQ8_MamsnjZ0UtEtmyxZJEnZJWPQtzRqphHWj_xGj9xiqnmML6ZMhpkXopfVPCbYFCzCf9FE/pub?gid=0&single=true&output=csv';
+    return await buscarCedulaEnCSV(csvUrlFase3, cedula, 1);
 }
 
 function setupConsultaResultados() {
@@ -1060,8 +1071,56 @@ function setupConsultaResultados() {
         btn.disabled = true;
 
         try {
-            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDza2h6HARc-jFfdjnAusdL2SS0LGlXkSb_eX2IkRfSK3kGBvwrkAuW3-MuOOYSQ/pub?gid=740909374&single=true&output=csv';
+            // 1. Validar Beneficiarios Finales
+            const esBeneficiarioFinal = await consultarBeneficiariosFinales(cedula);
 
+            if (esBeneficiarioFinal) {
+                // 2. SI LA CÉDULA ESTÁ EN LA TABLA DE BENEFICIARIOS FINALES
+                Swal.fire({
+                    icon: 'success',
+                    title: '🎉 ¡Felicitaciones! 🎉',
+                    html: `
+                        <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
+                            <p>Haces parte de los <strong>305 jóvenes beneficiarios</strong> que ingresan a ser fortalecidos con el programa <strong>NextGen Emprende NDS</strong>.</p>
+                            <p>Has superado exitosamente la fase de visita presencial a tu emprendimiento, demostrando tu compromiso, talento y dedicación.</p>
+                            <p>Muy pronto, nuestro equipo se estará comunicando contigo para brindarte todos los detalles sobre el desarrollo del proyecto, así como las etapas y fases que harán parte de esta gran experiencia.</p>
+                            <p>Gracias por creer en tu emprendimiento y aportar al crecimiento de nuestro territorio.</p>
+                            <p><strong>¡Seguimos construyendo un Norte, territorio de paz!</strong></p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#3085d6',
+                    width: 600
+                });
+                return; // Finaliza la ejecución
+            }
+
+            // 3 y 4. SI NO ESTÁ EN BENEFICIARIOS FINALES: validar Visitas Presenciales
+            const llegoATerceraFase = await consultarTerceraFase(cedula);
+
+            if (llegoATerceraFase) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Resultado de la convocatoria',
+                    html: `
+                        <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
+                            <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
+                            <p>Nos complace informarte que tu emprendimiento superó satisfactoriamente la <strong>fase de visita presencial</strong>, evidenciando compromiso, dedicación y avance en su proceso.</p>
+                            <p>Sin embargo, después de la valoración final realizada por el comité técnico del programa, en esta ocasión <strong>no fuiste seleccionado(a) para continuar a la siguiente fase como beneficiario(a) del proceso de fortalecimiento</strong>.</p>
+                            <p>Reconocemos el esfuerzo y el trabajo que has realizado, y te animamos a seguir fortaleciendo tu emprendimiento.</p>
+                            <p>Esperamos que continúes atento(a) a futuras convocatorias y oportunidades.</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: '#6c757d',
+                    width: 600
+                });
+                return; // Finaliza la ejecución
+            }
+
+            // 5. SI TAMPOCO ESTÁ EN VISITAS: consultar tabla anterior
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDza2h6HARc-jFfdjnAusdL2SS0LGlXkSb_eX2IkRfSK3kGBvwrkAuW3-MuOOYSQ/pub?gid=740909374&single=true&output=csv';
+            
             // Add timestamp to prevent caching
             const response = await fetch(csvUrl + '&_=' + Date.now());
             const text = await response.text();
@@ -1094,48 +1153,28 @@ function setupConsultaResultados() {
                 }
             }
 
+            // 6. SI LA CÉDULA APARECE EN ESA TABLA ANTERIOR
             if (encontrado && filaEncontrada) {
                 const requisitosMinimos = (filaEncontrada[3] || '').toString().trim().toUpperCase();
                 const evaluacion = (filaEncontrada[4] || '').toString().trim();
 
                 if (requisitosMinimos === 'CUMPLE') {
-
-                    const pasaTerceraFase = await consultarTerceraFase(cedula);
-
-                    if (pasaTerceraFase) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: '🎉 ¡Felicitaciones! Continúas en el proceso',
-                            html: `
-                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
-                                    <p>Nos complace compartir contigo excelentes noticias:</p>
-                                    <p>Has superado exitosamente la fase de evaluación de tu emprendimiento. Nos alegra informarte que avanzas a la siguiente etapa: <strong>visita presencial</strong>.</p>
-                                    <p>Nuestro equipo se pondrá en contacto contigo para coordinar los detalles de esta visita, cuyo propósito es validar la información de tu emprendimiento en campo y evaluar su potencial de cara a la selección de los 305 beneficiarios finales.</p>
-                                    <p>Agradecemos tu compromiso y dedicación con el fortalecimiento del emprendimiento en nuestro territorio.</p>
-                                    <p>Te invitamos a consultar la <strong>adenda a los TDR</strong>, donde encontrarás las actualizaciones del cronograma y las fechas clave de esta nueva fase del proceso.</p>
-                                </div>
-                            `,
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#3085d6',
-                            width: 600
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Resultado de la convocatoria',
-                            html: `
-                                <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
-                                    <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
-                                    <p>Te felicitamos por haber cumplido con la etapa anterior de validación de requisitos mínimos.</p>
-                                    <p>Sin embargo, tras finalizar la validación pertinente por parte del comité técnico del programa, te informamos que en esta ocasión tu emprendimiento <strong>no continúa a la fase de visitas presenciales</strong>.</p>
-                                    <p>Te invitamos a seguir trabajando con esa misma dedicación y a estar atento a futuras convocatorias y programas de apoyo al emprendimiento.</p>
-                                </div>
-                            `,
-                            confirmButtonText: 'Cerrar',
-                            confirmButtonColor: '#6c757d',
-                            width: 600
-                        });
-                    }
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Resultado de la convocatoria',
+                        html: `
+                            <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
+                                <p>Agradecemos profundamente tu participación en la convocatoria <strong>NEXTGEN EMPRENDE NDS</strong>.</p>
+                                <p>Tu emprendimiento avanzó satisfactoriamente en una fase anterior del proceso de selección.</p>
+                                <p>Sin embargo, tras la valoración realizada por el comité técnico del programa, en esta ocasión <strong>no continuó a la fase de visita presencial</strong>.</p>
+                                <p>Valoramos tu esfuerzo, compromiso y dedicación durante la convocatoria.</p>
+                                <p>Te invitamos a seguir fortaleciendo tu iniciativa y a estar atento(a) a futuras oportunidades.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Cerrar',
+                        confirmButtonColor: '#6c757d',
+                        width: 600
+                    });
                 } else if (requisitosMinimos === 'NO CUMPLE') {
                     if (evaluacion === '') {
                         Swal.fire({
@@ -1180,13 +1219,15 @@ function setupConsultaResultados() {
                     });
                 }
             } else {
+                // 7. SI NO APARECE EN NINGUNA DE LAS TRES TABLAS
                 Swal.fire({
                     icon: 'warning',
                     title: 'Registro no encontrado',
                     html: `
                         <div style="text-align: justify; font-size: 1.05rem; line-height: 1.6;">
-                            <p>No encontramos tu número de cédula dentro de la base de datos de resultados de la convocatoria.</p>
-                            <p>Verifica que el número ingresado sea correcto e inténtalo nuevamente.</p>
+                            <p>No encontramos tu número de cédula en las bases de datos del proceso de selección.</p>
+                            <p>Por favor, verifica que el número ingresado sea correcto e inténtalo nuevamente.</p>
+                            <p>Si consideras que se trata de un error, puedes comunicarte con el equipo del programa para recibir orientación.</p>
                         </div>
                     `,
                     confirmButtonText: 'Cerrar',
