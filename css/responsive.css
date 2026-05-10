@@ -1,0 +1,65 @@
+/* Responsive */
+@media (max-width: 900px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+}
+@media (max-width: 992px) {
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 850px) {
+    .business-grid { grid-template-columns: 1fr; gap: 30px; }
+    .modal-profile-header { flex-direction: column; text-align: center; }
+    .modal-profile-img { width: 150px; height: 150px; }
+    .community-modal-scrollable { padding: 25px; }
+    .business-header h2 { font-size: 2.2rem; }
+}
+@media (max-width: 768px) {
+    .nav-links {
+        display: none; flex-direction: column; position: absolute;
+        top: 100%; left: 0; width: 100%; background-color: var(--white);
+        padding: 20px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    .nav-links.active { display: flex; }
+    .mobile-menu-btn { display: block; }
+    .timeline::after { left: 31px; }
+    .timeline-item { width: 100%; padding-left: 70px; padding-right: 25px; }
+    .timeline-item::before {
+        left: 60px; border: medium solid white;
+        border-width: 10px 10px 10px 0; border-color: transparent white transparent transparent;
+    }
+    .timeline-icon { left: 10px; right: auto; }
+    .timeline-item:nth-child(even) { left: 0; }
+    .timeline-item:nth-child(even) .timeline-icon { left: 10px; }
+    .hero-content h1 { font-size: 2.2rem; }
+    .hero-content p { font-size: 1rem; margin-bottom: 30px; }
+    .header-logos img { height: 35px; }
+    .logo span { font-size: 1rem; display: none; }
+    .footer-logos { gap: 15px; }
+    .footer-logos img { height: 45px; }
+    .info-heading { flex-direction: row; gap: 12px; padding: 18px 20px; font-size: 1rem; }
+    .info-heading i { font-size: 1.5rem; min-width: 42px; height: 42px; padding: 10px; }
+    .evaluation-grid { grid-template-columns: 1fr; gap: 20px; }
+    .evaluation-card-header { padding: 15px 20px; gap: 12px; }
+    .evaluation-card-icon { font-size: 1.5rem; min-width: 45px; height: 45px; }
+    .evaluation-card-title { font-size: 1rem; }
+    .evaluation-card-body { padding: 20px; }
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-offices { text-align: center; }
+    .municipios-internal-grid { grid-template-columns: 1fr; }
+    .vitrina-modal-featured-img { height: 250px; }
+    .vitrina-modal-header, .vitrina-modal-body, .vitrina-modal-footer { padding-left: 20px; padding-right: 20px; }
+    .vitrina-modal-title { font-size: 1.6rem; }
+}
+@media (max-width: 600px) {
+    .gallery-grid { grid-template-columns: 1fr; }
+    .tdr-content { flex-direction: row; text-align: left; }
+    .tdr-icon { padding: 8px; font-size: 1.2rem; }
+    .btn-tdr { align-self: flex-end; width: auto; }
+}
+@media (max-width: 480px) {
+    .hero-content h1 { font-size: 1.8rem; }
+    .hero-content p { font-size: 0.95rem; }
+    .btn { padding: 10px 25px; }
+    .logo span { font-size: 0.9rem; }
+    .header-logos { gap: 5px; }
+}

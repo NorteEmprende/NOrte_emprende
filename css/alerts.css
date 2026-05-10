@@ -1,0 +1,22 @@
+/* ===========================================
+   Alert Styles
+   =========================================== */
+.alert-info {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #0d47a1;
+    font-size: 0.9rem;
+}
+
+.alert-info i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+.alert-info a {
+    text-decoration: underline;
+    font-weight: 600;
+}

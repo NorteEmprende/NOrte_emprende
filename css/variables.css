@@ -1,0 +1,17 @@
+/* ===========================================
+   CSS Variables
+   =========================================== */
+:root {
+    --primary-color: #AA192D;
+    /* Red Gobernación NDS */
+    --secondary-color: #2c3e50;
+    /* Dark Blue/Gray */
+    --accent-color: #e74c3c;
+    /* Lighter Red */
+    --text-color: #333;
+    --light-bg: #f8f9fa;
+    --white: #ffffff;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+    --transition: all 0.3s ease;
+}
