@@ -1,0 +1,36 @@
+/* Fixes to restore lost cascade properties */
+.whatsapp-btn {
+    background: #25d366;
+}
+
+.whatsapp-btn:hover {
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-btn.active {
+    background-color: #333;
+    transform: rotate(180deg);
+}
+
+
+.footer-content {
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.footer-logos img {
+    object-fit: contain;
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.logo i {
+    margin-right: 10px;
+    font-size: 1.8rem;
+}

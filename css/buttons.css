@@ -1,0 +1,83 @@
+/* ===========================================
+   Button Styles
+   =========================================== */
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    outline: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
+    box-shadow: 0 4px 15px rgba(170, 25, 45, 0.3);
+}
+
+.btn-primary:hover {
+    background-color: #8a1223;
+    transform: translateY(-2px);
+}
+
+.btn-large {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+}
+
+.btn-secondary {
+    background: #eee;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #ddd;
+}
+
+.btn-submit {
+    width: 100%;
+    background-color: var(--secondary-color);
+    border-radius: 5px;
+    font-size: 1.1rem;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-color);
+}
+
+.btn-card-outline {
+    background: transparent;
+    border: 1.5px solid #eee;
+    color: #666;
+    padding: 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border: 2px solid #ddd;
+    color: #666;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn-outline-secondary:hover {
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
+    background: #f9f9f9;
+}

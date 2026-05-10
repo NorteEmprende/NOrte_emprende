@@ -1,0 +1,20 @@
+/* ===========================================
+   Counter Section
+   =========================================== */
+#counter-section {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 40px 0;
+    text-align: center;
+}
+
+.counter-box h3 {
+    font-size: 3rem;
+    margin-bottom: 5px;
+}
+
+.counter-box p {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

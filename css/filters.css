@@ -1,0 +1,41 @@
+/* ===========================================
+   Community Filters
+   =========================================== */
+.filters-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 250px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.filter-group select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #555;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    border-color: var(--primary-color);
+    background-color: white;
+}

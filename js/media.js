@@ -1,14 +1,14 @@
 // ===========================================
-// Noticias Entry Point
-// Used by: noticias.html
+// Media Entry Point
+// Used by: media.html
 // ===========================================
 
 // UI
 import { setupMobileMenu, setupSmoothScroll } from './ui/navigation.js';
 import { setupModalListeners } from './ui/modal.js';
 
-// Vitrina History
-import { initNoticias } from './features/vitrina/vitrina-history.js';
+// Media Page
+import { loadMediaPage } from './features/media/media-page.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Navbar Toggle
@@ -20,6 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Setup Modal Close Listeners
     setupModalListeners();
 
-    // 4. Init Noticias (History + Filter)
-    initNoticias();
+    // 4. Load Media Page
+    loadMediaPage();
 });

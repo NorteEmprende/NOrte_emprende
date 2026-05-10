@@ -1,0 +1,314 @@
+/* ===========================================
+   Comunidad Modal - Dual View Professional
+   =========================================== */
+.community-modal-container {
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+/* Internal Pill Tabs */
+.community-modal-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 25px 30px 20px;
+    background: #fff;
+    border-bottom: 1px solid #f5f5f5;
+    z-index: 10;
+}
+
+.community-modal-tab-btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: 2px solid #f0f0f0;
+    background: #fff;
+    color: #777;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.community-modal-tab-btn i {
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.community-modal-tab-btn.active {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(170, 25, 45, 0.2);
+}
+
+.community-modal-tab-btn.active i {
+    opacity: 1;
+}
+
+.community-modal-tab-btn:hover:not(.active) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(170, 25, 45, 0.02);
+}
+
+/* Scrollable Zone */
+.community-modal-scrollable {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 40px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) #f0f0f0;
+}
+
+.community-modal-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.community-modal-scrollable::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+.community-modal-scrollable::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 10px;
+}
+
+.community-modal-view {
+    display: none;
+    animation: fadeInUp 0.5s ease;
+}
+
+.community-modal-view.active {
+    display: block;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Profile Visuals */
+.modal-profile-header {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 45px;
+    align-items: center;
+    background: #fafafa;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #f0f0f0;
+}
+
+.modal-profile-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 24px;
+    object-fit: cover;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 6px solid #fff;
+}
+
+.modal-profile-info {
+    flex-grow: 1;
+}
+
+.modal-profile-info h4 {
+    font-size: 2.4rem;
+    color: var(--secondary-color);
+    margin: 10px 0;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.modal-profile-info .subtitle {
+    color: var(--primary-color);
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.role-badge {
+    display: inline-block;
+    background: rgba(170, 25, 45, 0.1);
+    color: var(--primary-color);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Sections */
+.modal-section-title {
+    font-size: 0.95rem;
+    color: var(--secondary-color);
+    margin: 40px 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.modal-section-title::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.modal-section-title.no-border::after {
+    display: none;
+}
+
+.modal-text-content {
+    white-space: pre-wrap;
+    line-height: 1.8;
+    color: #444;
+    font-size: 1.15rem;
+    margin-bottom: 30px;
+}
+
+/* Video Wrapper */
+.modal-video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #000;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* Business View Grid */
+.business-header {
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.business-header h2 {
+    font-size: 3rem;
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.business-tag {
+    background: var(--primary-color);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.business-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 50px;
+}
+
+.info-card {
+    background: #f8f9fa;
+    padding: 35px;
+    border-radius: 24px;
+    border: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.sidebar-item i {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    margin-top: 3px;
+}
+
+.sidebar-item .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.sidebar-item .value {
+    color: var(--secondary-color);
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.sidebar-item .value-muni {
+    color: var(--primary-color);
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+.social-icons-row {
+    display: flex;
+    gap: 20px;
+}
+
+.social-icons-row a:hover {
+    transform: translateY(-5px);
+}
+
+.no-socials {
+    color: #bbb;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* Footer Close */
+.community-modal-footer {
+    padding: 25px 40px;
+    background: #fff;
+    border-top: 1px solid #f5f5f5;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 10;
+}
+
+.community-modal-footer button {
+    border-radius: 50px;
+    padding: 12px 35px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

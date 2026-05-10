@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunidad Emprendedora - NextGen Emprende NDS</title>
-    <meta name="description" content="Conoce a todos los emprendedores del proyecto NextGen Emprende NDS.">
+    <title>NextGen Media - NextGen Emprende NDS</title>
+    <meta name="description" content="Videos, historias y momentos del programa NextGen Emprende NDS.">
 
     <!-- Google Fonts -->
     <link
@@ -18,7 +18,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
 
-    <!-- Supabase JS -->
+    <!-- Supabase JS (kept for consistency with other pages) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -51,9 +51,9 @@
                     <li><a href="index.html">Inicio</a></li>
                     <li><a href="index.html#proyecto">Nuestro Proyecto</a></li>
                     <li><a href="index.html#criterios">Postúlate</a></li>
-                    <li><a href="index.html#comunidad" class="active">Comunidad</a></li>
+                    <li><a href="index.html#comunidad">Comunidad</a></li>
                     <li><a href="index.html#vitrina">Vitrina</a></li>
-                    <li><a href="media.html">NextGen Media</a></li>
+                    <li><a href="media.html" class="active">NextGen Media</a></li>
                 </ul>
                 <div class="mobile-menu-btn">
                     <i class="fa-solid fa-bars"></i>
@@ -62,54 +62,50 @@
         </div>
     </header>
 
-    <!-- Page Title -->
-    <section class="page-header section-padding bg-light" style="padding-bottom: 20px;">
-        <div class="container text-center">
-            <h1 class="section-title" style="margin-bottom: 10px;">Comunidad Emprendedora</h1>
-            <p class="lead-text">Descubre el talento joven de Norte de Santander</p>
-        </div>
-    </section>
+    <main>
+        <!-- Page Header -->
+        <section class="media-page-header">
+            <div class="container">
+                <h1>NextGen Media</h1>
+                <p>Historias, experiencias y momentos del programa.</p>
+            </div>
+        </section>
 
-    <!-- Filters Section -->
-    <section id="filters-section" class="section-padding" style="padding-top: 20px; padding-bottom: 20px;">
-        <div class="container">
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="filter-municipio"><i class="fa-solid fa-location-dot"></i> Municipio</label>
-                    <select id="filter-municipio">
-                        <option value="Todos">Todos los municipios</option>
-                        <!-- Options will be populated by JS -->
-                    </select>
+        <!-- Filters -->
+        <section class="section-padding" style="padding-top: 20px; padding-bottom: 0;">
+            <div class="container">
+                <div id="media-filters" class="media-filters-bar">
+                    <button class="media-filter-btn active" data-filter="all">
+                        <i class="fa-solid fa-border-all"></i> Todos
+                    </button>
+                    <button class="media-filter-btn" data-filter="vertical">
+                        <i class="fa-solid fa-mobile-screen"></i> Verticales
+                    </button>
+                    <button class="media-filter-btn" data-filter="horizontal">
+                        <i class="fa-solid fa-display"></i> Horizontales
+                    </button>
+                    <div class="media-search-wrap">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="media-search" class="media-search-input"
+                            placeholder="Buscar por título o descripción...">
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label for="filter-sector"><i class="fa-solid fa-tags"></i> Tipo de Emprendimiento</label>
-                    <select id="filter-sector">
-                        <option value="Todos">Todos los sectores</option>
-                        <!-- Options will be populated by JS -->
-                    </select>
+            </div>
+        </section>
+
+        <!-- Full Grid -->
+        <section class="section-padding" style="padding-top: 20px;">
+            <div class="container">
+                <div id="media-full-grid" class="media-full-grid">
+                    <!-- Dynamic Content Loading -->
+                    <div class="media-empty-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Cargando videos...</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Full Grid Section -->
-    <section id="comunidad-full" class="section-padding">
-        <div class="container">
-
-            <div id="comunidad-full-grid" class="cards-grid">
-                <!-- Javascript will inject content here -->
-                <div class="loader">Cargando comunidad...</div>
-            </div>
-
-            <div id="no-results-message" class="text-center" style="display: none; padding: 40px;">
-                <i class="fa-regular fa-folder-open" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
-                <p style="color: #666; font-size: 1.1rem;">No hay emprendimientos que coincidan con los filtros
-                    seleccionados.</p>
-                <button class="btn btn-primary" onclick="resetFilters()" style="margin-top: 15px;">Ver todos</button>
-            </div>
-
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer id="contact">
@@ -117,8 +113,7 @@
             <div class="footer-info">
                 <h4>Gobernación de Norte de Santander</h4>
                 <p>Secretaría de Desarrollo Económico y Productividad</p>
-                <p>Email: <a href="mailto:nextgenemprendends@gmail.com ">nextgenemprendends@gmail.com</a>
-                </p>
+                <p>Email: <a href="mailto:nextgenemprendends@gmail.com">nextgenemprendends@gmail.com</a></p>
             </div>
             <div class="footer-offices">
                 <h4>Oficinas</h4>
@@ -143,15 +138,10 @@
         </div>
     </footer>
 
-    <!-- WhatsApp Button -->
-    <a href="https://wa.me/573148804190" class="whatsapp-btn" target="_blank">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
-
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/supabase-config.js"></script>
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/media.js"></script>
 </body>
 
 </html>

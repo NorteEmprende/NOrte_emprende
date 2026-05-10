@@ -1,0 +1,59 @@
+/* ===========================================
+   Logo Styles (Header & Footer)
+   =========================================== */
+
+/* Header Logo - last definition wins (consolidated) */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-logos img {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo span {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Footer Logos - last definition wins (consolidated) */
+.footer-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 40px 0 20px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+}
+
+.footer-logos img {
+    filter: none;
+    /* Keep original colors */
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 4px;
+    height: 60px;
+    width: auto;
+}
+
+.footer-logos img:hover {
+    opacity: 1;
+}
+
+.footer-logo-large {
+    height: 80px !important;
+    /* Enlarge specific logos */
+}

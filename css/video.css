@@ -1,0 +1,24 @@
+/* Video Institucional */
+.video-institucional-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 30px auto 0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    aspect-ratio: 16 / 9;
+}
+.video-institucional-container iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+}
+.video-description {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+}

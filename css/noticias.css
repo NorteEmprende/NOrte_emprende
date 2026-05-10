@@ -1,0 +1,79 @@
+/* Noticias Page Styles (extracted from noticias.html inline) */
+.filter-section {
+    margin: 0 auto 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: #fff;
+    padding: 25px 35px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    max-width: fit-content;
+    border: 1px solid #eee;
+}
+.filter-label {
+    font-weight: 700;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+.select-filter {
+    padding: 12px 25px;
+    border-radius: 30px;
+    border: 2px solid #eee;
+    font-family: var(--font-body);
+    min-width: 280px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--secondary-color);
+    transition: all 0.3s ease;
+    appearance: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AA192D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 20px center / 15px;
+    outline: none;
+}
+.select-filter:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(170, 25, 45, 0.1);
+}
+.page-header {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../img/Banner.png') center/cover;
+    padding: 120px 0 80px;
+    text-align: center;
+    color: white;
+    margin-bottom: 60px;
+    position: relative;
+}
+.page-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: var(--primary-color);
+}
+.page-header h1 {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+.page-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.editorial-cta {
+    box-shadow: 0 10px 25px rgba(170, 25, 45, 0.2);
+    transition: all 0.3s ease;
+}
+.editorial-cta:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(170, 25, 45, 0.4);
+}
