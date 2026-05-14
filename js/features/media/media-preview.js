@@ -5,7 +5,7 @@
 import { fetchMediaData } from './media-data.js';
 import { createMediaCard } from './media-card.js';
 
-const MAX_PREVIEW_VIDEOS = 6;
+const MAX_PREVIEW_VIDEOS = 3;
 
 /**
  * Load the media preview carousel on index.html.

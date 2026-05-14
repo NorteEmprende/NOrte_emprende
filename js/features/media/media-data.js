@@ -130,15 +130,13 @@ function sortByDate(videos) {
 
 /**
  * Try to parse a date string in common formats.
+ * Prioritizes DD/MM/YYYY (Latin American format) over native Date parsing
+ * to avoid US M/D/Y misinterpretation (e.g. "4/02/2026" → April 2 vs Feb 4).
  */
 function parseDate(str) {
     if (!str) return null;
 
-    // Try native Date parse first
-    const d = new Date(str);
-    if (!isNaN(d.getTime())) return d;
-
-    // Try DD/MM/YYYY format
+    // Try DD/MM/YYYY or D/MM/YYYY format FIRST (slash or dash separated)
     const parts = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
     if (parts) {
         const year = parts[3].length === 2 ? 2000 + parseInt(parts[3]) : parseInt(parts[3]);
@@ -147,6 +145,10 @@ function parseDate(str) {
         const parsed = new Date(year, month, day);
         if (!isNaN(parsed.getTime())) return parsed;
     }
+
+    // Fallback: native Date parse for other formats (ISO, full strings, etc.)
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
 
     return null;
 }
