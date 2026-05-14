@@ -17,8 +17,6 @@ export function createMediaCard(video, index, videos) {
     const safeTitulo = escapeHtml(video.titulo);
     const safeFecha = escapeHtml(video.fecha);
     const safeDesc = escapeHtml(truncateText(video.descripcion, 60));
-    const formatLabel = video.formato === 'horizontal' ? 'Horizontal' : 'Vertical';
-    const formatClass = video.formato === 'horizontal' ? 'badge-horizontal' : 'badge-vertical';
 
     card.innerHTML = `
         <div class="media-video-thumbnail-wrap">
@@ -30,10 +28,6 @@ export function createMediaCard(video, index, videos) {
             <div class="media-play-overlay">
                 <i class="fa-solid fa-play"></i>
             </div>
-            <span class="media-format-badge ${formatClass}">
-                <i class="fa-solid ${video.formato === 'horizontal' ? 'fa-display' : 'fa-mobile-screen'}"></i>
-                ${formatLabel}
-            </span>
         </div>
         <div class="media-card-info">
             <span class="media-card-date"><i class="fa-regular fa-calendar"></i> ${safeFecha}</span>
