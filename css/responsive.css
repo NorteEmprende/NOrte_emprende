@@ -49,6 +49,8 @@
     .vitrina-modal-featured-img { height: 250px; }
     .vitrina-modal-header, .vitrina-modal-body, .vitrina-modal-footer { padding-left: 20px; padding-right: 20px; }
     .vitrina-modal-title { font-size: 1.6rem; }
+    .vitrina-modal-thumb { width: 65px; height: 48px; }
+    .vitrina-carousel-counter { font-size: 0.65rem; padding: 2px 8px; }
 }
 @media (max-width: 600px) {
     .gallery-grid { grid-template-columns: 1fr; }

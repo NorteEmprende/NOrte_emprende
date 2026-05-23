@@ -106,7 +106,96 @@
     letter-spacing: 0.5px;
 }
 
-/* Vitrina Modal Custom Layout */
+/* ===========================================
+   Vitrina Card Carousel
+   =========================================== */
+
+.vitrina-carousel {
+    position: relative;
+}
+
+.vitrina-carousel-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.vitrina-carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.vitrina-carousel-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vitrina-carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Dot indicators */
+.vitrina-carousel-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+}
+
+.vitrina-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vitrina-carousel-dot.active {
+    background: #fff;
+    transform: scale(1.2);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+.vitrina-carousel-dot:hover {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+/* Photo counter badge */
+.vitrina-carousel-counter {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.5px;
+}
+
+/* ===========================================
+   Vitrina Modal Custom Layout
+   =========================================== */
+
 .vitrina-modal-container {
     background: #fff;
     border-radius: 12px;
@@ -128,6 +217,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.2s ease;
 }
 
 .vitrina-modal-header {
@@ -182,4 +272,59 @@
     padding: 20px 40px 40px;
     display: flex;
     justify-content: flex-start;
+}
+
+/* ===========================================
+   Vitrina Modal Thumbnail Gallery
+   =========================================== */
+
+.vitrina-modal-thumbnails {
+    display: flex;
+    gap: 10px;
+    padding: 15px 0 10px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.vitrina-modal-thumbnails::-webkit-scrollbar {
+    height: 4px;
+}
+
+.vitrina-modal-thumbnails::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vitrina-modal-thumbnails::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.vitrina-modal-thumb {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.vitrina-modal-thumb:hover {
+    opacity: 0.85;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.vitrina-modal-thumb.active {
+    opacity: 1;
+    border-color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vitrina-modal-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
